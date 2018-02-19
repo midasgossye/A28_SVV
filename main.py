@@ -33,7 +33,7 @@ def Inertia():
     return None
 
 
-# calculating the cross section
+# calculating the cross section of components of the aileron
 def cross_section(ha, ca, tskin, tspar, stiffener_amount, w_stiffener, t_stiffener, h_stiffener):
     # C shape
     cshape = 0.5 * pi * ((ha / 2) ** 2) - 0.5 * pi * ((ha - (2 * tskin)) / 2) ** 2
@@ -43,6 +43,6 @@ def cross_section(ha, ca, tskin, tspar, stiffener_amount, w_stiffener, t_stiffen
     triangle = 0.5 * ha * (ca - 0.5 * ha) - 0.5 * (ha - 2 * tskin) * (ca - 0.5 * ha - tskin)
     # stiffeners
     stiffeners = stiffener_amount * (w_stiffener * t_stiffener + (h_stiffener - t_stiffener) * t_stiffener)
-    return cshape + spar + triangle + stiffeners
+    return cshape, spar, triangle, stiffeners
 
 
