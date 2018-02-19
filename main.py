@@ -45,4 +45,10 @@ def cross_section(ha, ca, tskin, tspar, stiffener_amount, w_stiffener, t_stiffen
     stiffeners = stiffener_amount * (w_stiffener * t_stiffener + (h_stiffener - t_stiffener) * t_stiffener)
     return cshape, spar, triangle, stiffeners
 
-
+# calculating the enclosed cross sectional area  
+def enc_area(ha, ca, tskin, tspar):
+    A_1 = 0.5 * pi * ((ha - (1 * tskin)) / 2) ** 2 # Circular section enclosed area
+    A_2 = 0.5 * (ha - 1 * tskin) * (ca - 0.5 * ha - tskin) # Triangular section enclosed area
+    return A_1, A_2
+    
+    
