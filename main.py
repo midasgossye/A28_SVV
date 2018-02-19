@@ -33,7 +33,7 @@ def Inertia():
     return None
 
 
-# calculating the cross section
+# calculating the cross sectional area
 def cross_section(ha, ca, tskin, tspar, stringer_amount, w_stringer, t_stringer, h_stringer):
     # C shape
     cshape = 0.5 * pi * ((ha / 2) ** 2) - 0.5 * pi * ((ha - (2 * tskin)) / 2) ** 2
@@ -45,4 +45,10 @@ def cross_section(ha, ca, tskin, tspar, stringer_amount, w_stringer, t_stringer,
     stringers = stringer_amount * (w_stringer * t_stringer + (h_stringer - t_stringer) * t_stringer)
     return cshape + spar + triangle + stringers
 
-
+# calculating the enclosed cross sectional area  
+def enc_area(ha, ca, tskin, tspar):
+    A_1 = 0.5 * pi * ((ha - (1 * tskin)) / 2) ** 2 # Circular section enclosed area
+    A_2 = 0.5 * (ha - 1 * tskin) * (ca - 0.5 * ha - tskin) # Triangular section enclosed area
+    return A_1, A_2
+    
+    
