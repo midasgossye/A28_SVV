@@ -36,13 +36,13 @@ def Inertia():
 # calculating the cross section
 def cross_section(ha, ca, tskin, tspar, stringer_amount, w_stringer, t_stringer, h_stringer):
     # C shape
-    cshape = 0.5 * math.pi * ((ha / 2) ** 2) - 0.5 * math.pi * ((ha - (2 * tskin) / 2) ** 2)
+    cshape = 0.5 * pi * ((ha / 2) ** 2) - 0.5 * pi * ((ha - (2 * tskin)) / 2) ** 2
     # spar
     spar = tspar * (ha - (2 * tskin))
     # triangle
     triangle = 0.5 * ha * (ca - 0.5 * ha) - 0.5 * (ha - 2 * tskin) * (ca - 0.5 * ha - tskin)
     # stringers
-    stringers = stringer_amount * w_stringer * t_stringer + (h_stringer - t_stringer) * t_stringer
+    stringers = stringer_amount * (w_stringer * t_stringer + (h_stringer - t_stringer) * t_stringer)
     return cshape + spar + triangle + stringers
 
 
