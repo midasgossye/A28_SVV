@@ -46,7 +46,7 @@ def cross_section(ha, ca, tskin, tspar, stiffener_amount, w_stiffener, t_stiffen
 
 
 # calculating the enclosed cross sectional area
-def enc_area(ha, ca, tskin, tspar):
+def enc_area(ha, ca, tskin):
     A_1 = 0.5 * pi * ((ha - (1 * tskin)) / 2) ** 2  # Circular section enclosed area
     A_2 = 0.5 * (ha - 1 * tskin) * (ca - 0.5 * ha - tskin)  # Triangular section enclosed area
     return A_1, A_2
@@ -83,14 +83,15 @@ def stif_loc(h, t_sk, n_st):
             z_y_angle_coords.append(apnd_itm)
         print "Stif.", i, "\t z:", z_coordinate, "\t y:", y_coordinate, "\t angle:", degrees(rot_angle)
 
-    return z_y_angle_coords #[(stringer0 z,y,rot),(stringer1 z,y,rot)]
+    return z_y_angle_coords  # [(stringer0 z,y,rot),(stringer1 z,y,rot)]
 
 
 def torsional_stiffness():
-    midcircle_perim = pi * (0.5 * h - 0.5*t_sk)
-    midtriangle_perim = 2* (sqrt((0.5 * h - t_sk) ** 2 + (C_a - 0.5 * h - t_sk) ** 2)-0.5*t_sk)
-    p = midcircle_perim+midtriangle_perim # wall mid line perimeter
-    
+    midcircle_perim = pi * (0.5 * h - 0.5 * t_sk)
+    midtriangle_perim = 2 * (sqrt((0.5 * h - t_sk) ** 2 + (C_a - 0.5 * h - t_sk) ** 2) - 0.5 * t_sk)
+    p = midcircle_perim + midtriangle_perim  # wall mid line perimeter
+    Ae = enc_area(h, C_a, t_sk)
+    J = (4 * Ae ** 2 * t) / p
     return
 
 
