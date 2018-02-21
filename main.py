@@ -50,6 +50,7 @@ def enc_area(ha, ca, tskin):
     A_2 = 0.5 * (ha - 1 * tskin) * (ca - 0.5 * ha - tskin)  # Triangular section enclosed area
     return A_1, A_2
 
+
 # inertia
 
 # returns stiffener z,y locations and rotation
@@ -82,6 +83,7 @@ def stif_loc(h, t_sk, n_st):
     return z_y_angle_coords  # [(stringer0 z,y,rot),(stringer1 z,y,rot)]
 
 
+# function to calculate torsional constant
 def torsional_constant(h, t_sk, C_a):
     midcircle_perim = pi * (0.5 * h - 0.5 * t_sk)  # wall mid line perimeter circular
     midtriangle_perim = 2 * (
@@ -91,9 +93,18 @@ def torsional_constant(h, t_sk, C_a):
     Ae = AeC + AeT  # total enclosed area
     J = (4 * Ae ** 2 * t_sk) / p
 
-    return J # torsional constant
+    return J  # torsional constant
 
+
+# function to calculate the boom area of stiffeners, which is assumed to be the same as the cross section area
+def br_st(h_st, t_st, w_st):
+    area_h = w_st * t_st  # horizontal component of stiffeners
+    area_v = (h_st - t_st) * t_st  # vertical component of stiffeners
+    return area_h + area_v  # total boom area
 
 # test
 # print "stiff location print:", stif_loc(h, t_sk, n_st)
-print "torsional constant", torsional_constant(h, t_sk, C_a)
+# print "torsional constant", torsional_constant(h, t_sk, C_a)
+
+# main
+# n_amount = 100
