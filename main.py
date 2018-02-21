@@ -26,6 +26,7 @@ d_3 = 20.66 * 10 ** (-2)    # Vertical displacement hinge 3 [m]
 theta = 25                  # Maximum upward deflection [deg]
 P = 20.6 * 10 ** 3          # Load in actuator 2 [N]
 q = 1.00 * 10 ** 3          # Net aerodynamic load [N/m]
+G = 28 * 10 ** 9            # Shear modulus in Pa (28 GPa, source: http://asm.matweb.com/search/SpecificMaterial.asp?bassnum=ma2024t3)
 
 
 
@@ -86,6 +87,10 @@ def stif_loc(h, t_sk, n_st):
 
 
 def torsional_stiffness():
+    midcircle_perim = pi * (0.5 * h - 0.5*t_sk)
+    midtriangle_perim = 2* (sqrt((0.5 * h - t_sk) ** 2 + (C_a - 0.5 * h - t_sk) ** 2)-0.5*t_sk)
+    p = midcircle_perim+midtriangle_perim # wall mid line perimeter
+    
     return
 
 
