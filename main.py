@@ -55,8 +55,9 @@ def Inertia(h, t_sk, n_st):
     total_perimeter = 0.5*pi*(0.5*h-t_sk) + sqrt((0.5*h-t_sk)**2+(C_a-0.5*h-t_sk)**2) # m
     circle_perim = 0.5*pi*(0.5*h-t_sk)
     spacing = total_perimeter/((n_st+1)/2)
-    
-    for i in xrange(7):
+    z_y_angle_coords = []
+    angle_rots = []
+    for i in xrange(6):
         local_spacing = i*spacing
         if local_spacing < circle_perim:
             angle = (local_spacing/circle_perim)*radians(90)
@@ -65,11 +66,14 @@ def Inertia(h, t_sk, n_st):
             rot_angle = angle+radians(90)
         
         else:
-            rot_angle = atan(0.5*h/(C_a-h))-radians(180)
-            z_coordinate = -((h-t_sk)/2)-(local_spacing-circle_perim)*cos(atan(0.5*h/(C_a-h)))
-            y_coordinate = h/2-(local_spacing-circle_perim)*sin(atan(0.5*h/(C_a-h)))
-        
+            rot_angle = atan(0.5*h/(C_a-0.5*h))-radians(180)
+            z_coordinate = -((h-t_sk)/2)-(local_spacing-circle_perim)*cos(atan(0.5*h/(C_a-0.5*h)))
+            y_coordinate = h/2-(local_spacing-circle_perim)*sin(atan(0.5*h/(C_a-0.5*h)))
+            
+        apnd_itm = (z_coordinate, y_coordinate, rot_angle)
+        z_y_angle_coords.append(apnd_itm)
         print "Stif.", i, "\t z:",z_coordinate, "\t y:", y_coordinate, "\t angle:", degrees(rot_angle)
-        
+    
+    return z_y_angle_coords
     
     
