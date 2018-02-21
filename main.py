@@ -41,14 +41,15 @@ def cross_section(ha, ca, tskin, tspar, stiffener_amount, w_stiffener, t_stiffen
     triangle = 0.5 * ha * (ca - 0.5 * ha) - 0.5 * (ha - 2 * tskin) * (ca - 0.5 * ha - tskin)
     # stiffeners
     stiffeners = stiffener_amount * (w_stiffener * t_stiffener + (h_stiffener - t_stiffener) * t_stiffener)
-    return cshape, spar, triangle, stiffeners
+    return cshape, spar, triangle, stiffeners  # unit: m^2
 
-# calculating the enclosed cross sectional area  
+
+# calculating the enclosed cross sectional area
 def enc_area(ha, ca, tskin, tspar):
-    A_1 = 0.5 * pi * ((ha - (1 * tskin)) / 2) ** 2 # Circular section enclosed area
-    A_2 = 0.5 * (ha - 1 * tskin) * (ca - 0.5 * ha - tskin) # Triangular section enclosed area
+    A_1 = 0.5 * pi * ((ha - (1 * tskin)) / 2) ** 2  # Circular section enclosed area
+    A_2 = 0.5 * (ha - 1 * tskin) * (ca - 0.5 * ha - tskin)  # Triangular section enclosed area
     return A_1, A_2
-    
+
     
 # functions
 def Inertia(h, t_sk, n_st):
@@ -75,5 +76,4 @@ def Inertia(h, t_sk, n_st):
         print "Stif.", i, "\t z:",z_coordinate, "\t y:", y_coordinate, "\t angle:", degrees(rot_angle)
     
     return z_y_angle_coords
-    
     
