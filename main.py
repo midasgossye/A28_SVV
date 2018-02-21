@@ -29,8 +29,7 @@ q = 1.00 * 10 ** 3          # Net aerodynamic load [N/m]
 G = 28 * 10 ** 9            # Shear modulus in Pa (28 GPa, source: http://asm.matweb.com/search/SpecificMaterial.asp?bassnum=ma2024t3)
 
 
-
-
+# functions
 
 # calculating the cross section of components of the aileron
 def cross_section(ha, ca, tskin, tspar, stiffener_amount, w_stiffener, t_stiffener, h_stiffener):
@@ -50,9 +49,6 @@ def enc_area(ha, ca, tskin):
     A_1 = 0.5 * pi * ((ha - (1 * tskin)) / 2) ** 2  # Circular section enclosed area
     A_2 = 0.5 * (ha - 1 * tskin) * (ca - 0.5 * ha - tskin)  # Triangular section enclosed area
     return A_1, A_2
-
-
-# functions
 
 # inertia
 
@@ -86,7 +82,7 @@ def stif_loc(h, t_sk, n_st):
     return z_y_angle_coords  # [(stringer0 z,y,rot),(stringer1 z,y,rot)]
 
 
-def torsional_stiffness(h, t_sk, C_a, G):
+def torsional_constant(h, t_sk, C_a):
     midcircle_perim = pi * (0.5 * h - 0.5 * t_sk)  # wall mid line perimeter circular
     midtriangle_perim = 2 * (
         sqrt((0.5 * h - t_sk) ** 2 + (C_a - 0.5 * h - t_sk) ** 2) - 0.5 * t_sk)  # wall mid line perimeter triangle
@@ -95,9 +91,9 @@ def torsional_stiffness(h, t_sk, C_a, G):
     Ae = AeC + AeT  # total enclosed area
     J = (4 * Ae ** 2 * t_sk) / p
 
-    return J * G  # torsional stiffness
+    return J # torsional constant
 
 
 # test
 # print "stiff location print:", stif_loc(h, t_sk, n_st)
-print "torsional stiffness", torsional_stiffness(h, t_sk, C_a, G)
+print "torsional constant", torsional_constant(h, t_sk, C_a)
