@@ -52,9 +52,14 @@ def enc_area(ha, ca, tskin, tspar):
 
 
 # functions
-def Inertia(h, t_sk, n_st):
-    total_perimeter = 0.5 * pi * (0.5 * h - t_sk) + sqrt((0.5 * h - t_sk) ** 2 + (C_a - 0.5 * h - t_sk) ** 2)  # m
+
+# inertia
+
+# returns stiffener z,y locations and rotation
+def stif_loc(h, t_sk, n_st):
     circle_perim = 0.5 * pi * (0.5 * h - t_sk)
+    total_perimeter = circle_perim + sqrt((0.5 * h - t_sk) ** 2 + (C_a - 0.5 * h - t_sk) ** 2)  # m
+
     spacing = total_perimeter / ((n_st + 1) / 2)
     z_y_angle_coords = []
     for i in xrange(6):
@@ -77,8 +82,12 @@ def Inertia(h, t_sk, n_st):
             z_y_angle_coords.append(apnd_itm)
         print "Stif.", i, "\t z:", z_coordinate, "\t y:", y_coordinate, "\t angle:", degrees(rot_angle)
 
-    return z_y_angle_coords
+    return z_y_angle_coords #[(stringer0 z,y,rot),(stringer1 z,y,rot)]
+
+
+def torsional_stiffness():
+    return
 
 
 # test
-print Inertia(h, t_sk, n_st)
+print stif_loc(h, t_sk, n_st)
