@@ -26,10 +26,10 @@ d_3 = 20.66 * 10 ** (-2)    # Vertical displacement hinge 3 [m]
 theta = 25                  # Maximum upward deflection [deg]
 P = 20.6 * 10 ** 3          # Load in actuator 2 [N]
 q = 1.00 * 10 ** 3          # Net aerodynamic load [N/m]
+G = 28 * 10 ** 9            # Shear modulus in Pa (28 GPa, source: http://asm.matweb.com/search/SpecificMaterial.asp?bassnum=ma2024t3)
 
 
-
-
+# functions
 
 # calculating the cross section of components of the aileron
 def cross_section(ha, ca, tskin, tspar, stiffener_amount, w_stiffener, t_stiffener, h_stiffener):
@@ -45,13 +45,11 @@ def cross_section(ha, ca, tskin, tspar, stiffener_amount, w_stiffener, t_stiffen
 
 
 # calculating the enclosed cross sectional area
-def enc_area(ha, ca, tskin, tspar):
+def enc_area(ha, ca, tskin):
     A_1 = 0.5 * pi * ((ha - (1 * tskin)) / 2) ** 2  # Circular section enclosed area
     A_2 = 0.5 * (ha - 1 * tskin) * (ca - 0.5 * ha - tskin)  # Triangular section enclosed area
     return A_1, A_2
 
-
-# functions
 
 # inertia
 
@@ -82,11 +80,26 @@ def stif_loc(h, t_sk, n_st):
             z_y_angle_coords.append(apnd_itm)
         print "Stif.", i, "\t z:", z_coordinate, "\t y:", y_coordinate, "\t angle:", degrees(rot_angle)
 
-    return z_y_angle_coords #[(stringer0 z,y,rot),(stringer1 z,y,rot)]
+    return z_y_angle_coords  # [(stringer0 z,y,rot),(stringer1 z,y,rot)]
 
 
-def torsional_stiffness():
-    return
+# function to calculate torsional constant
+def torsional_constant(h, t_sk, C_a):
+    midcircle_perim = pi * (0.5 * h - 0.5 * t_sk)  # wall mid line perimeter circular
+    midtriangle_perim = 2 * (
+        sqrt((0.5 * h - t_sk) ** 2 + (C_a - 0.5 * h - t_sk) ** 2) - 0.5 * t_sk)  # wall mid line perimeter triangle
+    p = midcircle_perim + midtriangle_perim  # wall mid line perimeter
+    AeC, AeT = enc_area(h, C_a, t_sk)  # enclosed area of circular part and triangle part
+    Ae = AeC + AeT  # total enclosed area
+    J = (4 * Ae ** 2 * t_sk) / p
+
+    return J  # torsional constant
+
+# function to calculate the boom area of stiffeners, which is assumed to be the same as the cross section area
+def br_st(h_st, t_st, w_st):
+    area_h = w_st * t_st  # horizontal component of stiffeners
+    area_v = (h_st - t_st) * t_st  # vertical component of stiffeners
+    return area_h + area_v  # total boom area
 
 def axis_transformation(I_zz, I_yy,I_zy, rot_angle):
     # Axis transformation for rotated axis system used for Inertia calculations
@@ -144,8 +157,11 @@ def moment_of_inertia(z_y_angle_coords, t_st, h_st, w_st):
 
         
         
-        
     print TOT_I_zz_br, TOT_I_yy_br, TOT_I_zy_br
-    
+
 # test
-print stif_loc(h, t_sk, n_st)
+# print "stiff location print:", stif_loc(h, t_sk, n_st)
+# print "torsional constant", torsional_constant(h, t_sk, C_a)
+
+# main
+# n_amount = 100
