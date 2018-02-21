@@ -86,14 +86,18 @@ def stif_loc(h, t_sk, n_st):
     return z_y_angle_coords  # [(stringer0 z,y,rot),(stringer1 z,y,rot)]
 
 
-def torsional_stiffness():
-    midcircle_perim = pi * (0.5 * h - 0.5 * t_sk)
-    midtriangle_perim = 2 * (sqrt((0.5 * h - t_sk) ** 2 + (C_a - 0.5 * h - t_sk) ** 2) - 0.5 * t_sk)
+def torsional_stiffness(h, t_sk, C_a, G):
+    midcircle_perim = pi * (0.5 * h - 0.5 * t_sk)  # wall mid line perimeter circular
+    midtriangle_perim = 2 * (
+        sqrt((0.5 * h - t_sk) ** 2 + (C_a - 0.5 * h - t_sk) ** 2) - 0.5 * t_sk)  # wall mid line perimeter triangle
     p = midcircle_perim + midtriangle_perim  # wall mid line perimeter
-    Ae = enc_area(h, C_a, t_sk)
-    J = (4 * Ae ** 2 * t) / p
-    return
+    AeC, AeT = enc_area(h, C_a, t_sk)  # enclosed area of circular part and triangle part
+    Ae = AeC + AeT  # total enclosed area
+    J = (4 * Ae ** 2 * t_sk) / p
+
+    return J * G  # torsional stiffness
 
 
 # test
-print stif_loc(h, t_sk, n_st)
+# print "stiff location print:", stif_loc(h, t_sk, n_st)
+print "torsional stiffness", torsional_stiffness(h, t_sk, C_a, G)
