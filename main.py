@@ -50,35 +50,26 @@ def enc_area(ha, ca, tskin, tspar):
     A_2 = 0.5 * (ha - 1 * tskin) * (ca - 0.5 * ha - tskin)  # Triangular section enclosed area
     return A_1, A_2
 
-
+    
 # functions
 def Inertia(h, t_sk, n_st):
-    circle_perim = 0.5 * pi * (0.5 * h - t_sk)
-    slope = sqrt((0.5 * h - t_sk) ** 2 + (C_a - 0.5 * h - t_sk) ** 2)
-    total_perimeter = circle_perim + slope
-    slope_angle = atan(0.5 * h / (C_a - 0.5 * h)) - radians(180)
-    emptyspacetrailingedge = (h_st * cos(slope_angle)) / (sin(slope_angle))
-    print total_perimeter
-    print emptyspacetrailingedge
-    spacing = (total_perimeter - emptyspacetrailingedge) / ((n_st + 1) / 2)
-
+    total_perimeter = 0.5*pi*(0.5*h-t_sk) + sqrt((0.5*h-t_sk)**2+(C_a-0.5*h-t_sk)**2) # m
+    circle_perim = 0.5*pi*(0.5*h-t_sk)
+    spacing = total_perimeter/((n_st+1)/2)
+    
     for i in xrange(7):
-        local_spacing = i * spacing
+        local_spacing = i*spacing
         if local_spacing < circle_perim:
-            angle = (local_spacing / circle_perim) * radians(90)
-            z_coordinate = -0.5 * h - t_sk + cos(angle) * (0.5 * h - t_sk)
-            y_coordinate = sin(angle) * (0.5 * h - t_sk)
-            rot_angle = angle + radians(90)
-
+            angle = (local_spacing/circle_perim)*radians(90)
+            z_coordinate = -0.5*h-t_sk+cos(angle)*(0.5*h-t_sk)
+            y_coordinate = sin(angle)*(0.5*h-t_sk)
+            rot_angle = angle+radians(90)
+        
         else:
-            rot_angle = atan(0.5 * h / (C_a - 0.5 * h)) - radians(180)
-            z_coordinate = -((h - t_sk) / 2) - (local_spacing - circle_perim) * cos(atan(0.5 * h / (C_a - 0.5 * h)))
-            y_coordinate = (slope - (local_spacing - circle_perim)) * sin(atan(0.5 * h / (C_a - 0.5 * h)))
-
-        print "Stif.", i, "\t z:", z_coordinate, "\t y:", y_coordinate, "\t angle:", degrees(rot_angle)
-    print "the max height of the possible stiffener location is:", slope * sin(atan(0.5 * h / (C_a - 0.5 * h)))
-    print "max possible height should be:", h / 2 - t_sk
-
-
-# testing
-Inertia(h, t_sk, n_st)
+            rot_angle = atan(0.5*h/(C_a-h))-radians(180)
+            z_coordinate = -((h-t_sk)/2)-(local_spacing-circle_perim)*cos(atan(0.5*h/(C_a-h)))
+            y_coordinate = h/2-(local_spacing-circle_perim)*sin(atan(0.5*h/(C_a-h)))
+        
+        print "Stif.", i, "\t z:",z_coordinate, "\t y:", y_coordinate, "\t angle:", degrees(rot_angle)
+        
+    
