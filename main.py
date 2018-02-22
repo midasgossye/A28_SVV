@@ -120,8 +120,6 @@ def axis_transformation(I_zz, I_yy, I_zy, rot_angle):
     return I_uu, I_vv, I_uv
 
 
-def moment_of_inertia(z_y_angle_coords, t_st, h_st, w_st):
-    
 def moment_of_inertia(z_y_angle_coords, t_st, h_st, w_st, t_sp, h):
 
     # Calculate Inertias for simple beam axis system
@@ -207,9 +205,9 @@ def moment_of_inertia(z_y_angle_coords, t_st, h_st, w_st, t_sp, h):
 class TestGeoPropFunctions(unittest.TestCase):
     def test_Xsection(self):
         self.assertEqual(cross_section(0, 0, 0, 0, 0, 0, 0, 0), (0, 0, 0, 0))  # zero test
-        self.assertAlmostEqual(sum(cross_section(h, C_a, t_sk, t_sp, 11, w_st, t_st, h_st)), 0.002, places=None,
-                               msg=None, delta=(0.002 / 10))  # test data from catia model
-
+        # self.assertAlmostEqual(sum(cross_section(h, C_a, t_sk, t_sp, 11, w_st, t_st, h_st)), 0.002, places=None,
+        #                        msg=None, delta=(0.002 / 10))  # test data from catia model
+        self.assertAlmostEqual(sum(cross_section(h, C_a, t_sk, t_sp, 11, w_st, t_st, h_st)), 0.002)
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestGeoPropFunctions)
 unittest.TextTestRunner(verbosity=2).run(suite)
