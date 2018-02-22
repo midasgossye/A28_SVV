@@ -95,68 +95,75 @@ def torsional_constant(h, t_sk, C_a):
 
     return J  # torsional constant
 
+
 # function to calculate the boom area of stiffeners, which is assumed to be the same as the cross section area
 def br_st(h_st, t_st, w_st):
     area_h = w_st * t_st  # horizontal component of stiffeners
     area_v = (h_st - t_st) * t_st  # vertical component of stiffeners
     return area_h + area_v  # total boom area
 
-def axis_transformation(I_zz, I_yy,I_zy, rot_angle):
+
+# function to calculate boom area due to the skin only
+# sigma1 is this current boom, sigma2 is adjacent boom, t_sk is the thickness of panel, w is width in between
+def br_sk(sigma1, sigma2, t_sk, w):
+    b1 = (t_sk * w) / 6 * (2 + sigma2 / sigma1)  # idealization to boom area
+    return b1
+
+
+def axis_transformation(I_zz, I_yy, I_zy, rot_angle):
     # Axis transformation for rotated axis system used for Inertia calculations
-    I_uu = (I_zz+I_yy)*0.5 + (I_zz-I_yy)*0.5*cos(2*rot_angle) - I_zy*sin(2*rot_angle)
-    I_vv = (I_zz+I_yy)*0.5 - (I_zz-I_yy)*0.5*cos(2*rot_angle) + I_zy*sin(2*rot_angle)
-    I_uv = (I_zz-I_yy)*0.5*sin(2*rot_angle) + I_zy*cos(2*rot_angle)
+    I_uu = (I_zz + I_yy) * 0.5 + (I_zz - I_yy) * 0.5 * cos(2 * rot_angle) - I_zy * sin(2 * rot_angle)
+    I_vv = (I_zz + I_yy) * 0.5 - (I_zz - I_yy) * 0.5 * cos(2 * rot_angle) + I_zy * sin(2 * rot_angle)
+    I_uv = (I_zz - I_yy) * 0.5 * sin(2 * rot_angle) + I_zy * cos(2 * rot_angle)
     return I_uu, I_vv, I_uv
-    
+
+
 def moment_of_inertia(z_y_angle_coords, t_st, h_st, w_st):
-    
     # Calculate Inertias for simple beam axis system
     #   |        
     #   |        ^ (y)
-    #-------  <--| (z)
-    
+    # -------  <--| (z)
+
     # === Determine base and height values of inv-T beam rectangles
     b_1 = w_st
     h_1 = t_st
     b_2 = t_st
-    h_2 = h_st-t_st
+    h_2 = h_st - t_st
     # ===
-    
+
     # === Calculate individual I_zz and I_yy and sum steiner term
-    I_zz_1 = (b_1*(h_1**3))/12 + b_1*h_1*((t_st*0.5)**2)
-    I_yy_1 = ((b_1**3)*h_1)/12
-    
-    I_yy_2 = ((b_2**3)*h_2)/12
-    I_zz_2 = (b_2*(h_2**3)/12) + b_2*h_2*((h_2*0.5+t_st)**2 )
+    I_zz_1 = (b_1 * (h_1 ** 3)) / 12 + b_1 * h_1 * ((t_st * 0.5) ** 2)
+    I_yy_1 = ((b_1 ** 3) * h_1) / 12
+
+    I_yy_2 = ((b_2 ** 3) * h_2) / 12
+    I_zz_2 = (b_2 * (h_2 ** 3) / 12) + b_2 * h_2 * ((h_2 * 0.5 + t_st) ** 2)
     # ===
-    
+
     # === BASE INERTIAS AND AREA FOR INVERSE-T BEAM
     I_zz = I_zz_1 + I_zz_2
     I_yy = I_yy_1 + I_yy_2
-    I_zy= 0
-    A_st = w_st*t_st + t_st*(h_st-t_st)
+    I_zy = 0
+    A_st = w_st * t_st + t_st * (h_st - t_st)
     # ===
-    
+
     TOT_I_zz_br = 0
     TOT_I_yy_br = 0
     TOT_I_zy_br = 0
     for coords in z_y_angle_coords:
-        z_coord, y_coord, rot_angle = coords # Get z,y and rotation angle for each stiffener
-        stiff_I_zz, stiff_I_yy, stiff_I_zy = axis_transformation(I_zz, I_yy,I_zy,rot_angle) # perform inertia axis angle transformation 
-        I_zz_body_ref = stiff_I_zz + A_st*(y_coord**2) # Apply parallel axis theorem 
-        I_yy_body_ref = stiff_I_yy + A_st*(z_coord**2) # Apply parallel axis theorem 
-        I_zy_body_ref = stiff_I_zy + A_st*y_coord*z_coord # Apply parallel axis theorem 
-        
-        
-        #=== SUM ALL STIFFENER MOMENT OF INERTIA's W.R.T. BODY REFERENCE SYSTEM
+        z_coord, y_coord, rot_angle = coords  # Get z,y and rotation angle for each stiffener
+        stiff_I_zz, stiff_I_yy, stiff_I_zy = axis_transformation(I_zz, I_yy, I_zy,
+                                                                 rot_angle)  # perform inertia axis angle transformation
+        I_zz_body_ref = stiff_I_zz + A_st * (y_coord ** 2)  # Apply parallel axis theorem
+        I_yy_body_ref = stiff_I_yy + A_st * (z_coord ** 2)  # Apply parallel axis theorem
+        I_zy_body_ref = stiff_I_zy + A_st * y_coord * z_coord  # Apply parallel axis theorem
+
+        # === SUM ALL STIFFENER MOMENT OF INERTIA's W.R.T. BODY REFERENCE SYSTEM
         # NOTE: TOTAL I_zy inertia should be zero, because total cross-section has an axis of symmetry
         #       If calculated TOTAL I_zy is NOT equal to zero, there is an error in the computation
         TOT_I_zz_br += I_zz_body_ref
         TOT_I_yy_br += I_yy_body_ref
-        TOT_I_zy_br += I_zy_body_ref # Should be zero, if not => check values!
+        TOT_I_zy_br += I_zy_body_ref  # Should be zero, if not => check values!
 
-        
-        
     print TOT_I_zz_br, TOT_I_yy_br, TOT_I_zy_br
 
 # test
