@@ -119,9 +119,6 @@ def axis_transformation(I_zz, I_yy, I_zy, rot_angle):
     I_uv = (I_zz - I_yy) * 0.5 * sin(2 * rot_angle) + I_zy * cos(2 * rot_angle)
     return I_uu, I_vv, I_uv
 
-
-def moment_of_inertia(z_y_angle_coords, t_st, h_st, w_st):
-    
 def moment_of_inertia(z_y_angle_coords, t_st, h_st, w_st, t_sp, h):
 
     # Calculate Inertias for simple beam axis system
