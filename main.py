@@ -179,7 +179,9 @@ def moment_of_inertia(z_y_angle_coords, t_st, h_st, w_st):
 # testunits for unittests
 class TestGeoPropFunctions(unittest.TestCase):
     def test_Xsection(self):
-        self.assertEqual(cross_section(0, 0, 0, 0, 0, 0, 0, 0), (0, 0, 0, 0))
+        self.assertEqual(cross_section(0, 0, 0, 0, 0, 0, 0, 0), (0, 0, 0, 0))  # zero test
+        self.assertAlmostEqual(sum(cross_section(h, C_a, t_sk, t_sp, 11, w_st, t_st, h_st)), 0.002, places=None,
+                               msg=None, delta=(0.002 / 10))  # test data from catia model
 
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestGeoPropFunctions)
