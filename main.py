@@ -9,6 +9,7 @@ from math import *
 import unittest
 import scipy.integrate as integrate
 
+
 # Global variables
 C_a = 0.515                 # Chord length aileron [m]
 l_a = 2.691                 # Span of the aileron [m]
@@ -198,6 +199,7 @@ def moment_of_inertia(z_y_angle_coords, t_st, h_st, w_st, t_sp, h):
     # ===
         
     print TOT_I_zz_br, TOT_I_yy_br, TOT_I_zy_br, I_zz_s_circ
+
 # test
 # print "stiff location print:", stif_loc(h, t_sk, n_st)
 # print "torsional constant", torsional_constant(h, t_sk, C_a)
@@ -207,7 +209,7 @@ class TestGeoPropFunctions(unittest.TestCase):
         self.assertEqual(cross_section(0, 0, 0, 0, 0, 0, 0, 0), (0, 0, 0, 0))  # zero test
         # self.assertAlmostEqual(sum(cross_section(h, C_a, t_sk, t_sp, 11, w_st, t_st, h_st)), 0.002, places=None,
         #                        msg=None, delta=(0.002 / 10))  # test data from catia model
-        self.assertAlmostEqual(sum(cross_section(h, C_a, t_sk, t_sp, 11, w_st, t_st, h_st)), 0.002)
+        self.assertAlmostEqual(sum(cross_section(h, C_a, t_sk, t_sp, 0, w_st, t_st, h_st)), 0.002, places=3)
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestGeoPropFunctions)
 unittest.TextTestRunner(verbosity=2).run(suite)
