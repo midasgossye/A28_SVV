@@ -152,8 +152,8 @@ def moment_of_inertia(z_y_angle_coords, t_st, h_st, w_st, t_sp, h):
         #=== SUM ALL STIFFENER MOMENTS OF INERTIA's W.R.T. BODY REFERENCE SYSTEM
         # NOTE: TOTAL I_zy inertia should be zero, because total cross-section has an axis of symmetry
         #       If calculated TOTAL I_zy is NOT equal to zero, there is an error in the computation
-        TOT_I_zz_br += I_zz_body_ref
-        TOT_I_yy_br += I_yy_body_ref
+        #TOT_I_zz_br += I_zz_body_ref
+        #TOT_I_yy_br += I_yy_body_ref
         TOT_I_zy_br += I_zy_body_ref # Should be zero, if not => check values!
     
     
