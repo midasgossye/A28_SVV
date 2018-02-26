@@ -58,10 +58,10 @@ x = sp.Symbol('x')
 #E = sp.Symbol('E')
 
 #Squared bending moment equations for different sections of the beam
-m_1 = (-q*x**2/2)**2                                                            #for 0<x<x_1
-m_2 = (-q*x_1**2/2+H_1_y*x-q*x**2/2)**2                                         #for x_1<x<x_2
-m_3 = (-q*x_1**2/2+H_1_y*x_2-q*x_2**2/2+H_2_y*x-q*x**2/2)**2                    #for x_2<x<x_3
-m_4 = (H_1_y*x_2+H_2_y*x_3-q/2*(x_1**2+x_2**2+x_3**2)+H_3_y*x-q*x**2/2)**2      #for x_3<x<l_a
+m_1 = (-q*x**2/2)**2                            #for 0<x<x_1                                #for 0<x<x_1
+m_2 = (H_1_y*x-q*x**2/2)**2                     #for x_1<x<x_2
+m_3 = (H_2_y*x-q*x**2/2)**2                     #for x_2<x<x_3
+m_4 = (H_3_y*x-q*x**2/2)**2                     #for x_3<x<l_a
 
 #shear equations for different sections of the beam
 FR = (f_s)/(2*A*G)
