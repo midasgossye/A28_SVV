@@ -80,7 +80,7 @@ def stif_loc(h, t_sk, n_st):
         if i > 0:
             apnd_itm = (z_coordinate, -y_coordinate, -rot_angle)
             z_y_angle_coords.append(apnd_itm)
-        print "Stif.", i, "\t z:", z_coordinate, "\t y:", y_coordinate, "\t angle:", degrees(rot_angle)
+        #print "Stif.", i, "\t z:", z_coordinate, "\t y:", y_coordinate, "\t angle:", degrees(rot_angle)
 
     return z_y_angle_coords  # [(stringer0 z,y,rot),(stringer1 z,y,rot)]
 
@@ -119,7 +119,7 @@ def axis_transformation(I_zz, I_yy, I_zy, rot_angle):
     I_uv = (I_zz - I_yy) * 0.5 * sin(2 * rot_angle) + I_zy * cos(2 * rot_angle)
     return I_uu, I_vv, I_uv
 
-def moment_of_inertia(z_y_angle_coords, t_st, h_st, w_st, t_sp, h):
+def moment_of_inertia(z_y_angle_coords, t_st, h_st, w_st, t_sp, h, theta):
 
     # Calculate Inertias for simple beam axis system
     #   |        
@@ -179,7 +179,7 @@ def moment_of_inertia(z_y_angle_coords, t_st, h_st, w_st, t_sp, h):
     a = sqrt((0.5 * h - t_sk) ** 2 + (C_a - 0.5 * h - t_sk) ** 2)
     angle = atan(0.5 * h / (C_a - 0.5 * h))
     I_zz_t = ((a**3 * t_sk * (sin(angle))**2)/12 + a*t_sk*(0.25*(h-t_sk))**2)*2
-    print angle, I_zz_t
+    #print angle, I_zz_t
     I_yy_t = 2*((a**3 * t_sk * (cos(angle))**2)/12) + 2*a*t_sk*((C_a - 0.5 * h - t_sk)*0.5)**2
     
     TOT_I_zz_br += I_zz_t
@@ -193,8 +193,20 @@ def moment_of_inertia(z_y_angle_coords, t_st, h_st, w_st, t_sp, h):
 
     TOT_I_zz_br += I_zz_spar
     # ===
+    
+    # === Transform Inertias from Body Reference system to Main Reference system
+    TOT_I_zz, TOT_I_yy, TOT_I_zy = axis_transformation(TOT_I_zz_br, TOT_I_yy_br, TOT_I_zy_br, theta)
+    
+    # ===
         
-    return TOT_I_zz_br, TOT_I_yy_br
+    # Returns I_zz and I_yy in our OWN DEFINED BODY REFERENCE SYSTEM, followed by the I_zz, I_yy and I_zy in the main reference system
+    # NOTE: All reported values are in m^4
+    return TOT_I_zz_br, TOT_I_yy_br, TOT_I_zz, TOT_I_yy, TOT_I_zy
+ 
+print "Moments: (I_z'z', I_y'y', I_zz, I_yy, I_zy) All in m^4" 
+print moment_of_inertia(stif_loc(h, t_sk, n_st), t_st, h_st, w_st, t_sp, h, theta)
+
+
     
 # test
 # print "stiff location print:", stif_loc(h, t_sk, n_st)
