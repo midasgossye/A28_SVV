@@ -180,7 +180,7 @@ def moment_of_inertia(z_y_angle_coords, t_st, h_st, w_st, t_sp, h):
     angle = atan(0.5 * h / (C_a - 0.5 * h))
     I_zz_t = ((a**3 * t_sk * (sin(angle))**2)/12 + a*t_sk*(0.25*(h-t_sk))**2)*2
     print angle, I_zz_t
-    I_yy_t = 2*((a**3 * t_sk * (cos(angle))**2)/12) + 2*a*t_sk*(C_a - 0.5 * h - t_sk)**2
+    I_yy_t = 2*((a**3 * t_sk * (cos(angle))**2)/12) + 2*a*t_sk*((C_a - 0.5 * h - t_sk)*0.5)**2
     
     TOT_I_zz_br += I_zz_t
     TOT_I_yy_br += I_yy_t
