@@ -1,3 +1,5 @@
+import calculating_reaction_forces as reac
+
 # ------------------------------------------
 # -------INTERNAL-LOADS---------------------
 # ------------------------------------------
@@ -12,9 +14,6 @@ x_a = 0.3  # m
 q = 1.00 * 10 ** 3  # N/m
 P = P = 20.6 * 10 ** 3  # N
 
-H_1_y = -55704  # N
-H_2_y = 91291  # N
-H_3_y = -32895  # N
 
 # var = input('Please enter an x coordinate between 0 and 2.691 m:')
 #
@@ -40,9 +39,13 @@ H_3_y = -32895  # N
 #     print 'The shear at point x=', var, 'equals', v, 'N'
 
 
-def internal(var):
+def internal(var, Izz):
+    H_1_y, H_1_z, H_2_y, H_2_z, H_3_y, A_1_z = reac.calc_reac_f(Izz)
 
-    if int(var)>2.691 or int(var)<0:
+    # H_1_y = -55704  # N
+    # H_2_y = 91291  # N
+    # H_3_y = -32895  # N
+    if int(var) > 2.691 or int(var) < 0:
         raise ValueError('internal shear and moment module error, x coordinates is out of bounds')
     if int(var) in range(0, int(x_1)):
         m = (-q * var ** 2 / 2)
