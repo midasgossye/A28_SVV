@@ -31,7 +31,7 @@ def ROT(A, G, t, q_s):
 
 
 # maximum deflection
-def maxdefl(dTheta, v, LEdist, TEdist):
-    leading = dTheta * LEdist - v
-    trailing = dTheta * TEdist + v
+def maxdefl(dTheta, v, LEdist, TEdist, z):
+    leading = dTheta * z * LEdist - v
+    trailing = dTheta * z * TEdist + v
     return leading, trailing
