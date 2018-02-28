@@ -84,7 +84,9 @@ def stif_loc(h, t_sk, n_st):
         if i > 0:
             apnd_itm = (z_coordinate, -y_coordinate, -rot_angle)
             z_y_angle_coords.append(apnd_itm)
+
         print "Stif.", i, "\t z:", z_coordinate, "\t y:", y_coordinate, "\t angle:", degrees(rot_angle)
+
 
     return z_y_angle_coords  # [(stringer0 z,y,rot),(stringer1 z,y,rot), ...]
 
@@ -128,7 +130,6 @@ def axis_transformation(I_zz, I_yy, I_zy, rot_angle):
 
 
 def moment_of_inertia(z_y_angle_coords, t_st, h_st, w_st, t_sp, h, theta):
-
     # Calculate Inertias for simple beam axis system
     #   |        
     #   |        ^ (y)
@@ -176,7 +177,9 @@ def moment_of_inertia(z_y_angle_coords, t_st, h_st, w_st, t_sp, h, theta):
 
     # === Semi_circle Moment of inertia:
 
+
     I_zz_s_circ = integrate.quad(lambda x: t_sk*((0.5*h*sin(x))**2)*0.5*h, -pi/2, pi/2)[0]
+
 
     I_yy_s_circ = I_zz_s_circ
     TOT_I_zz_br += I_zz_s_circ
@@ -188,10 +191,9 @@ def moment_of_inertia(z_y_angle_coords, t_st, h_st, w_st, t_sp, h, theta):
     a = sqrt((0.5 * h - t_sk) ** 2 + (C_a - 0.5 * h - t_sk) ** 2)
     angle = atan(0.5 * h / (C_a - 0.5 * h))
 
-    I_zz_t = ((a**3 * t_sk * (sin(angle))**2)/12 + a*t_sk*(0.25*(h-t_sk))**2)*2
-    #print angle, I_zz_t
-    I_yy_t = 2*((a**3 * t_sk * (cos(angle))**2)/12) + 2*a*t_sk*((C_a - 0.5 * h - t_sk)*0.5)**2
-    
+    I_zz_t = ((a ** 3 * t_sk * (sin(angle)) ** 2) / 12 + a * t_sk * (0.25 * (h - t_sk)) ** 2) * 2
+    # print angle, I_zz_t
+    I_yy_t = 2 * ((a ** 3 * t_sk * (cos(angle)) ** 2) / 12) + 2 * a * t_sk * ((C_a - 0.5 * h - t_sk) * 0.5) ** 2
 
     TOT_I_zz_br += I_zz_t
     TOT_I_yy_br += I_yy_t
@@ -207,12 +209,13 @@ def moment_of_inertia(z_y_angle_coords, t_st, h_st, w_st, t_sp, h, theta):
 
     # === Transform Inertias from Body Reference system to Main Reference system
     TOT_I_zz, TOT_I_yy, TOT_I_zy = axis_transformation(TOT_I_zz_br, TOT_I_yy_br, TOT_I_zy_br, theta)
-    
+
     # ===
-        
+
     # Returns I_zz and I_yy in our OWN DEFINED BODY REFERENCE SYSTEM, followed by the I_zz, I_yy and I_zy in the main reference system
     # NOTE: All reported values are in m^4
     return TOT_I_zz_br, TOT_I_yy_br, TOT_I_zz, TOT_I_yy, TOT_I_zy
+
     
     
 def boom_area_calc(stif_loc, t_st, h_st, w_st, t_sp, h):
@@ -250,7 +253,6 @@ print moment_of_inertia(stif_loc(h, t_sk, n_st), t_st, h_st, w_st, t_sp, h, thet
 
 
 
-
 # main
 stif_data = stif_loc(h, t_sk, n_st)  # initialize stiffener properties
 # Boom idealization ,ignore LE
@@ -260,22 +262,35 @@ circle_perim = 0.5 * pi * (0.5 * h - t_sk)
 total_perimeter = circle_perim + sqrt((0.5 * h - t_sk) ** 2 + (C_a - 0.5 * h - t_sk) ** 2)  # m
 spacing = total_perimeter / ((n_st + 1) / 2)
 # calculating the stiffeners' total boom area
-b_r.append(br_st(h_st, t_st, w_st))  # boom at neutral axis
-for a in xrange(
-                n_st - 3):  # iterate 0-8, 9 is special case at LE, 10 is TE calculated separately to prevent list out of bounds
-    i = a + 1  # ignoring the number 0 stiffener at the neutral axis at LE, done before loop
-    totalboomarea = br_st(h_st, t_st, w_st) + br_sk(stif_data[i][1], stif_data[i + 2][1], t_sk, spacing)
-    b_r.append(totalboomarea)
-totalboomareanine = br_st(h_st, t_st, w_st) + br_sk(stif_data[1][1], stif_data[2][1], t_sk,
-                                                    spacing * 2)  # 9 special case
-lasttotalboomarea = br_st(h_st, t_st, w_st) + br_sk(stif_data[n_st - 2][1], stif_data[n_st - 1][1], t_sk,
-                                                    spacing)  # 10 special case
-b_r.append(totalboomareanine)
-b_r.append(lasttotalboomarea)
+b_st = []
+b_sp = []
+# b_st, b_sp = boom
+b_r.append()
+# b_r.append(br_st(h_st, t_st, w_st))  # boom at neutral axis
+# for a in xrange(
+#                 n_st - 3):  # iterate 0-8, 9 is special case at LE, 10 is TE calculated separately to prevent list out of bounds
+#     i = a + 1  # ignoring the number 0 stiffener at the neutral axis at LE, done before loop
+#     totalboomarea = br_st(h_st, t_st, w_st) + br_sk(stif_data[i][1], stif_data[i + 2][1], t_sk, spacing)
+#     b_r.append(totalboomarea)
+# totalboomareanine = br_st(h_st, t_st, w_st) + br_sk(stif_data[1][1], stif_data[2][1], t_sk,
+#                                                     spacing * 2)  # 9 special case
+# lasttotalboomarea = br_st(h_st, t_st, w_st) + br_sk(stif_data[n_st - 2][1], stif_data[n_st - 1][1], t_sk,
+#                                                     spacing)  # 10 special case
+# b_r.append(totalboomareanine)
+# b_r.append(lasttotalboomarea)
 # torsional stiffness
 J = torsional_constant(h, t_sk, C_a)
 # crosssection
 A = sum(cross_section(h, C_a, t_sk, t_sp, n_st, w_st, t_st, h_st))
+model = []  # whole model
+
+
+def iteration(number):
+
+
+for y in xrange(n):
+    model.append(iteration(y))
+
 
 # internal stress and deflection
 
