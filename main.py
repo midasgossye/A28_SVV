@@ -29,12 +29,14 @@ theta = 25                  # Maximum upward deflection [deg]
 P = 20.6 * 10 ** 3          # Load in actuator 2 [N]
 q = 1.00 * 10 ** 3          # Net aerodynamic load [N/m]
 G = 28 * 10 ** 9            # Shear modulus in Pa (28 GPa, source: http://asm.matweb.com/search/SpecificMaterial.asp?bassnum=ma2024t3)
-n = 100                     # sections to be analysed
+n = 20                      # sections to be analysed
 
 
 # functions
 
 # calculating the cross section of components of the aileron
+# input  height aileron ha, chord length aileron ca, skin thickness tskin, spar thickness tspar,
+# stiffener_amount, width stiffener w_stiffener, thickness stiffener t_stiffener, height stiffener h_stiffener
 # return cshape, spar, triangle, stiffeners  # unit: m^2
 def cross_section(ha, ca, tskin, tspar, stiffener_amount, w_stiffener, t_stiffener, h_stiffener):
     # C shape
@@ -105,6 +107,7 @@ def torsional_constant(h, t_sk, C_a):
     return J  # torsional constant
 
 
+<<<<<<< HEAD
 # function to calculate the boom area of stiffeners, which is assumed to be the same as the cross section area
 # return area_h + area_v  # total boom area m^2
 def br_st(h_st, t_st, w_st):
@@ -116,6 +119,22 @@ def br_st(h_st, t_st, w_st):
 # function to calculate boom area due to the skin only
 # sigma1 is this current boom, sigma2 is adjacent boom, t_sk is the thickness of panel, w is width in between
 # returns b1 #boom area in m^2
+=======
+# # function to calculate the boom area of stiffeners, which is assumed to be the same as the cross section area
+# # return area_h + area_v  # total boom area m^2
+# def br_st(h_st, t_st, w_st):
+#     area_h = w_st * t_st  # horizontal component of stiffeners
+#     area_v = (h_st - t_st) * t_st  # vertical component of stiffeners
+#     return area_h + area_v  # total boom area
+#
+#
+# # function to calculate boom area due to the skin only
+# # sigma1 is this current boom, sigma2 is adjacent boom, t_sk is the thickness of panel, w is width in between
+# # returns b1 #boom area in m^2
+# def br_sk(sigma1, sigma2, t_sk, w):
+#     b1 = (t_sk * w) / 6 * (2 + sigma2 / sigma1)  # idealization to boom area
+#     return b1
+>>>>>>> d1e8495c237be9d78d58f47d1c15c3c145b7bb75
 
 
 def axis_transformation(I_zz, I_yy, I_zy, rot_angle):
@@ -181,7 +200,7 @@ def moment_of_inertia(z_y_angle_coords, t_st, h_st, w_st, t_sp, h, theta):
     I_yy_s_circ = I_zz_s_circ
     TOT_I_zz_br += I_zz_s_circ
     TOT_I_yy_br += I_yy_s_circ
-    
+
     # ===
 
     # === Triangle skin moment of inertia
@@ -213,11 +232,11 @@ def moment_of_inertia(z_y_angle_coords, t_st, h_st, w_st, t_sp, h, theta):
     # NOTE: All reported values are in m^4
     return TOT_I_zz_br, TOT_I_yy_br, TOT_I_zz, TOT_I_yy, TOT_I_zy
 
-    
-    
+
+
 def boom_area_calc(stif_loc, t_st, h_st, w_st, t_sp, h):
     A_st = w_st*t_st + (h_st-t_st)*t_st
-    
+
     circle_perim = 0.5 * pi * (0.5 * h - t_sk)
     total_perimeter = circle_perim + sqrt((0.5 * h - t_sk) ** 2 + (C_a - 0.5 * h - t_sk) ** 2)  # m
 
@@ -237,16 +256,17 @@ def boom_area_calc(stif_loc, t_st, h_st, w_st, t_sp, h):
             sigma_ratio = (stif_loc[i][1])/(stif_loc[i+2][1])
             B_i = A_st + ((t_sk*spacing)/6)*(2+sigma_ratio)
             B_i_arr.append(B_i)
-        
+
     sigma_ratio = -1
     B_spar_end = ((t_sp*(h-2*t_sk))/6)*(2+sigma_ratio)
+
     
     # returns an array with all stiffener boom area's and the value of the spar end_cap area
     # 0-th boom is boom at LE, 1st 
     return B_i_arr, B_spar_end
-    
 
-print "Moments: (I_z'z', I_y'y', I_zz, I_yy, I_zy) All in m^4" 
+B_i_arr[0]
+print "Moments: (I_z'z', I_y'y', I_zz, I_yy, I_zy) All in m^4"
 print moment_of_inertia(stif_loc(h, t_sk, n_st), t_st, h_st, w_st, t_sp, h, theta)
 
 
