@@ -29,7 +29,10 @@ G = 28*10**9        #shear modulus aluminum 2014-T3 [Pa]
 d_1 = 0.134         #m
 d_3 = 0.2066        #m
 E = 73.1*10**9      #Pa
-I_zprimezprime = 1.437615789242078e-05  #m**4
+
+#--THE FOLLOWING VALUES WILL FOLLOW FROM THE NUMERICAL METHOD
+#--S_zprime and S_yprime are the values of the resultant forces along the body axes.
+I_zprimezprime = 1.437615789242078e-05  #m**4   
 I_yprimeyprime = 6.473600927242316e-05  #m**4
 S_zprime =
 S_yprime = 
