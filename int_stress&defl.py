@@ -24,12 +24,11 @@ def defl(M_x, I_z_z, E):
 # TODO numerical implementation of a contour integration(done with numpy.quad): check with test data
 # rate of twist
 # returns d(theta)/dz
-def ROT(A, G, t, q_s):
-    s = 11
+def ROT(A, G, t, q_s, s):
     dTheta = q_s / (2 * A) * intg.quad(G / t, 0, s)
     return dTheta
 
-
+# TODO check this
 # maximum deflection
 def maxdefl(dTheta, v, LEdist, TEdist, z):
     leading = dTheta * z * LEdist
