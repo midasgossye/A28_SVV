@@ -8,28 +8,29 @@ Created on Mon Feb 19 14:07:00 2018
 from math import *
 import unittest
 import scipy.integrate as integrate
+import int_stress&defl.py as int_stress
 
 # Global variables
-C_a = 0.515                 # Chord length aileron [m]
-l_a = 2.691                 # Span of the aileron [m]
-x_1 = 0.174                 # x-location of hinge 1 [m]
-x_2 = 1.051                 # x-location of hinge 2 [m]
-x_3 = 2.512                 # x-location of hinge 3 [m]
-x_a = 0.300                 # Distance between actuator 1 and 2 [m]
-h = 0.248                   # Aileron height [m]
-t_sk = 1.1 * 10 ** (-3)     # Skin thickness [m]
-t_sp = 2.2 * 10 ** (-3)     # Spar thickness [m]
-t_st = 1.2 * 10 ** (-3)     # Thickness of stiffener [m]
-h_st = 1.5 * 10 ** (-2)     # Height of stiffener [m]
-w_st = 3.0 * 10 ** (-2)     # Width of stiffener [m]
-n_st = 11                   # Number of stiffeners [-]
-d_1 = 10.34 * 10 ** (-2)    # Vertical displacement hinge 1 [m]
-d_3 = 20.66 * 10 ** (-2)    # Vertical displacement hinge 3 [m]
-theta = 25                  # Maximum upward deflection [deg]
-P = 20.6 * 10 ** 3          # Load in actuator 2 [N]
-q = 1.00 * 10 ** 3          # Net aerodynamic load [N/m]
-G = 28 * 10 ** 9            # Shear modulus in Pa (28 GPa, source: http://asm.matweb.com/search/SpecificMaterial.asp?bassnum=ma2024t3)
-n = 20                      # sections to be analysed
+C_a = 0.515  # Chord length aileron [m]
+l_a = 2.691  # Span of the aileron [m]
+x_1 = 0.174  # x-location of hinge 1 [m]
+x_2 = 1.051  # x-location of hinge 2 [m]
+x_3 = 2.512  # x-location of hinge 3 [m]
+x_a = 0.300  # Distance between actuator 1 and 2 [m]
+h = 0.248  # Aileron height [m]
+t_sk = 1.1 * 10 ** (-3)  # Skin thickness [m]
+t_sp = 2.2 * 10 ** (-3)  # Spar thickness [m]
+t_st = 1.2 * 10 ** (-3)  # Thickness of stiffener [m]
+h_st = 1.5 * 10 ** (-2)  # Height of stiffener [m]
+w_st = 3.0 * 10 ** (-2)  # Width of stiffener [m]
+n_st = 11  # Number of stiffeners [-]
+d_1 = 10.34 * 10 ** (-2)  # Vertical displacement hinge 1 [m]
+d_3 = 20.66 * 10 ** (-2)  # Vertical displacement hinge 3 [m]
+theta = 25  # Maximum upward deflection [deg]
+P = 20.6 * 10 ** 3  # Load in actuator 2 [N]
+q = 1.00 * 10 ** 3  # Net aerodynamic load [N/m]
+G = 28 * 10 ** 9  # Shear modulus in Pa (28 GPa, source: http://asm.matweb.com/search/SpecificMaterial.asp?bassnum=ma2024t3)
+n = 20  # sections to be analysed
 
 
 # functions
@@ -51,7 +52,8 @@ def cross_section(ha, ca, tskin, tspar, stiffener_amount, w_stiffener, t_stiffen
 
 
 # calculating the enclosed cross sectional area
-# returns A_1, A_2 #areas m^2
+# input height aileron ha, chord length aileron ca, thickness tskin
+# returns Circular section enclosed area A_1, Triangular section enclosed area A_2 #areas m^2
 def enc_area(ha, ca, tskin):
     A_1 = 0.5 * pi * ((ha - (1 * tskin)) / 2) ** 2  # Circular section enclosed area
     A_2 = 0.5 * (ha - 1 * tskin) * (ca - 0.5 * ha - tskin)  # Triangular section enclosed area
@@ -87,8 +89,7 @@ def stif_loc(h, t_sk, n_st):
             apnd_itm = (z_coordinate, -y_coordinate, -rot_angle)
             z_y_angle_coords.append(apnd_itm)
 
-        print "Stif.", i, "\t z:", z_coordinate, "\t y:", y_coordinate, "\t angle:", degrees(rot_angle)
-
+        # print "Stif.", i, "\t z:", z_coordinate, "\t y:", y_coordinate, "\t angle:", degrees(rot_angle)
 
     return z_y_angle_coords  # [(stringer0 z,y,rot),(stringer1 z,y,rot), ...]
 
@@ -107,6 +108,7 @@ def torsional_constant(h, t_sk, C_a):
     return J  # torsional constant
 
 
+########OLD BOOM AREA########
 # # function to calculate the boom area of stiffeners, which is assumed to be the same as the cross section area
 # # return area_h + area_v  # total boom area m^2
 # def br_st(h_st, t_st, w_st):
@@ -121,8 +123,11 @@ def torsional_constant(h, t_sk, C_a):
 # def br_sk(sigma1, sigma2, t_sk, w):
 #     b1 = (t_sk * w) / 6 * (2 + sigma2 / sigma1)  # idealization to boom area
 #     return b1
+########OLD BOOM AREA########
 
-
+# transforms the axis system to the rotated axis
+# input IZZ, IYY IZY ,rotation angle
+# outputs the new IZZ IYY and IZY as IUU IVV IUV
 def axis_transformation(I_zz, I_yy, I_zy, rot_angle):
     # Axis transformation for rotated axis system used for Inertia calculations
     I_uu = (I_zz + I_yy) * 0.5 + (I_zz - I_yy) * 0.5 * cos(2 * rot_angle) - I_zy * sin(2 * rot_angle)
@@ -131,6 +136,10 @@ def axis_transformation(I_zz, I_yy, I_zy, rot_angle):
     return I_uu, I_vv, I_uv
 
 
+# funtion to calculate MMOI
+# input stiffner data as z_y_angle_coords, thickness skin t_st, height stiffeners h_st, width stiffener w_st,
+#  thickness spar t_sp,aileron height  h, maximum upward deflection theta
+# returns IZZ in body ref:  TOT_I_zz_br, IYY body ref:  TOT_I_yy_br, IZZ: TOT_I_zz, IYY: TOT_I_yy, IZY: TOT_I_zy
 def moment_of_inertia(z_y_angle_coords, t_st, h_st, w_st, t_sp, h, theta):
     # Calculate Inertias for simple beam axis system
     #   |        
@@ -180,8 +189,7 @@ def moment_of_inertia(z_y_angle_coords, t_st, h_st, w_st, t_sp, h, theta):
     # === Semi_circle Moment of inertia:
 
 
-    I_zz_s_circ = integrate.quad(lambda x: t_sk*((0.5*h*sin(x))**2)*0.5*h, -pi/2, pi/2)[0]
-
+    I_zz_s_circ = integrate.quad(lambda x: t_sk * ((0.5 * h * sin(x)) ** 2) * 0.5 * h, -pi / 2, pi / 2)[0]
 
     I_yy_s_circ = I_zz_s_circ
     TOT_I_zz_br += I_zz_s_circ
@@ -219,9 +227,8 @@ def moment_of_inertia(z_y_angle_coords, t_st, h_st, w_st, t_sp, h, theta):
     return TOT_I_zz_br, TOT_I_yy_br, TOT_I_zz, TOT_I_yy, TOT_I_zy
 
 
-
 def boom_area_calc(stif_loc, t_st, h_st, w_st, t_sp, h):
-    A_st = w_st*t_st + (h_st-t_st)*t_st
+    A_st = w_st * t_st + (h_st - t_st) * t_st
 
     circle_perim = 0.5 * pi * (0.5 * h - t_sk)
     total_perimeter = circle_perim + sqrt((0.5 * h - t_sk) ** 2 + (C_a - 0.5 * h - t_sk) ** 2)  # m
@@ -230,69 +237,60 @@ def boom_area_calc(stif_loc, t_st, h_st, w_st, t_sp, h):
     B_i_arr = []
     for i in xrange(n_st):
         if i == 0:
-            sigma_ratio = (stif_loc[i][1])/(stif_loc[i+1][1])
-            B_i = A_st + ((t_sk*spacing)/6)*(2+sigma_ratio)
+            sigma_ratio = (stif_loc[i][1]) / (stif_loc[i + 1][1])
+            B_i = A_st + ((t_sk * spacing) / 6) * (2 + sigma_ratio)
             B_i_arr.append(B_i)
-        elif i == (n_st-2):
-            sigma_ratio = (stif_loc[i-2][1])/(stif_loc[i][1])
-            B_i = A_st + ((t_sk*spacing)/6)*(2+sigma_ratio)
+        elif i == (n_st - 2):
+            sigma_ratio = (stif_loc[i - 2][1]) / (stif_loc[i][1])
+            B_i = A_st + ((t_sk * spacing) / 6) * (2 + sigma_ratio)
             B_i_arr.append(B_i)
             B_i_arr.append(B_i)
-        elif i < (n_st-2):
-            sigma_ratio = (stif_loc[i][1])/(stif_loc[i+2][1])
-            B_i = A_st + ((t_sk*spacing)/6)*(2+sigma_ratio)
+        elif i < (n_st - 2):
+            sigma_ratio = (stif_loc[i][1]) / (stif_loc[i + 2][1])
+            B_i = A_st + ((t_sk * spacing) / 6) * (2 + sigma_ratio)
             B_i_arr.append(B_i)
 
     sigma_ratio = -1
-    B_spar_end = ((t_sp*(h-2*t_sk))/6)*(2+sigma_ratio)
+    B_spar_end = ((t_sp * (h - 2 * t_sk)) / 6) * (2 + sigma_ratio)
 
     return B_i_arr, B_spar_end
 
-B_i_arr[0]
-print "Moments: (I_z'z', I_y'y', I_zz, I_yy, I_zy) All in m^4"
-print moment_of_inertia(stif_loc(h, t_sk, n_st), t_st, h_st, w_st, t_sp, h, theta)
 
-
-
+# print "Moments: (I_z'z', I_y'y', I_zz, I_yy, I_zy) All in m^4"
+# print moment_of_inertia(stif_loc(h, t_sk, n_st), t_st, h_st, w_st, t_sp, h, theta)
 
 # main
 stif_data = stif_loc(h, t_sk, n_st)  # initialize stiffener properties
-# Boom idealization ,ignore LE
+# Boom idealization
 b_r = []  # list for the resultant boom areas
-# spacing calculation, copy pasta from func: stif_loc
-circle_perim = 0.5 * pi * (0.5 * h - t_sk)
-total_perimeter = circle_perim + sqrt((0.5 * h - t_sk) ** 2 + (C_a - 0.5 * h - t_sk) ** 2)  # m
-spacing = total_perimeter / ((n_st + 1) / 2)
 # calculating the stiffeners' total boom area
-b_st = []
 b_sp = []
-b_st, b_sp = boom_area_calc(stif_data, t_st, h_st, w_st, t_sp, h)
-b_r.append()
-# b_r.append(br_st(h_st, t_st, w_st))  # boom at neutral axis
-# for a in xrange(
-#                 n_st - 3):  # iterate 0-8, 9 is special case at LE, 10 is TE calculated separately to prevent list out of bounds
-#     i = a + 1  # ignoring the number 0 stiffener at the neutral axis at LE, done before loop
-#     totalboomarea = br_st(h_st, t_st, w_st) + br_sk(stif_data[i][1], stif_data[i + 2][1], t_sk, spacing)
-#     b_r.append(totalboomarea)
-# totalboomareanine = br_st(h_st, t_st, w_st) + br_sk(stif_data[1][1], stif_data[2][1], t_sk,
-#                                                     spacing * 2)  # 9 special case
-# lasttotalboomarea = br_st(h_st, t_st, w_st) + br_sk(stif_data[n_st - 2][1], stif_data[n_st - 1][1], t_sk,
-#                                                     spacing)  # 10 special case
-# b_r.append(totalboomareanine)
-# b_r.append(lasttotalboomarea)
-# torsional stiffness
+b_r, b_sp = boom_area_calc(stif_data, t_st, h_st, w_st, t_sp,
+                           h)  # b_r is the list off stiffener boom areas, b_sp for spar(single value in m^2)
+
 J = torsional_constant(h, t_sk, C_a)
 # crosssection
-A = sum(cross_section(h, C_a, t_sk, t_sp, n_st, w_st, t_st, h_st))
+A = sum(cross_section(h, C_a, t_sk, t_sp, n_st, w_st, t_st, h_st))  # A is sum of cross section
+
+I_zz_br, I_yy_br, I_zz, I_yy, I_zy = moment_of_inertia(stif_data, t_st, h_st, w_st, t_sp, h,
+                                                       theta)  # values for the MMOI
+
+enclosed = sum(enc_area(h, C_a, t_sk))  # enclosed area size
+
 model = []  # whole model
 
+# TODO:under construction
+def iteration(section_number):
+    # normal stress
+    sigma_boom = []
+    for i in len(stif_data):
+        sigma_boom.append(norm_strs(M_z, I_z_z, y))
+    return None
 
-def iteration(number):
 
+for y in xrange(n):
+    model.append(iteration(y))
 
-#for y in xrange(n):
- #   model.append(iteration(y))
-    pass
 
 # internal stress and deflection
 
