@@ -14,11 +14,11 @@ def norm_strs(M_z, I_z_z, y):
     return sigma_x
 
 
-# deflection function
-# returns v prime prime
-def defl(M_x, I_z_z, E):
-    v = -1 * M_x / (E * I_z_z)
-    return v
+# # deflection function
+# # returns v prime prime
+# def defl(M_z, I_z_z, E):
+#     v = -1 * M_z / (E * I_z_z)
+#     return v
 
 
 # TODO numerical implementation of a contour integration(done with numpy.quad): check with test data
