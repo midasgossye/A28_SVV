@@ -261,7 +261,7 @@ I_zz_br, I_yy_br, I_zz, I_yy, I_zy = moment_of_inertia(stif_data, t_st, h_st, w_
 enclosed = sum(enc_area(h, C_a, t_sk))  # enclosed area size
 
 model = []  # whole model
-section_length = l_a / section_number
+section_length = l_a / n
 
 
 # TODO:under construction
@@ -273,7 +273,7 @@ def iteration(section_number):
     M, V = intsm.internal(mid_x_pos)
     for i in xrange(len(stif_data)):
         sigma_boom.append(norm_strs(M, I_zz_br, stif_data[i][1]))
-    
+
     return None
 
 
