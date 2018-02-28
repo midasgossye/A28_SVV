@@ -42,6 +42,8 @@ else:
 
 def internal(var):
 
+    if int(var)>2.691 or int(var)<0:
+        raise ValueError('internal shear and moment module error, x coordinates is out of bounds')
     if int(var) in range(0, int(x_1)):
         m = (-q * var ** 2 / 2)
         v = q * var

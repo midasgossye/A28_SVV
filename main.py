@@ -278,12 +278,16 @@ I_zz_br, I_yy_br, I_zz, I_yy, I_zy = moment_of_inertia(stif_data, t_st, h_st, w_
 enclosed = sum(enc_area(h, C_a, t_sk))  # enclosed area size
 
 model = []  # whole model
-
+section_length = section_number
 # TODO:under construction
 def iteration(section_number):
+
+    x_start = section_number *
     # normal stress
     sigma_boom = []
+    mid_x_pos =
     for i in xrange(len(stif_data)):
+
         sigma_boom.append(norm_strs(M_z, I_z_z, y))
     return None
 
