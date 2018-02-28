@@ -106,37 +106,6 @@ def torsional_constant(h, t_sk, C_a):
 
     return J  # torsional constant
 
-
-<<<<<<< HEAD
-# function to calculate the boom area of stiffeners, which is assumed to be the same as the cross section area
-# return area_h + area_v  # total boom area m^2
-def br_st(h_st, t_st, w_st):
-    area_h = w_st * t_st  # horizontal component of stiffeners
-    area_v = (h_st - t_st) * t_st  # vertical component of stiffeners
-    return area_h + area_v  # total boom area
-
-
-# function to calculate boom area due to the skin only
-# sigma1 is this current boom, sigma2 is adjacent boom, t_sk is the thickness of panel, w is width in between
-# returns b1 #boom area in m^2
-=======
-# # function to calculate the boom area of stiffeners, which is assumed to be the same as the cross section area
-# # return area_h + area_v  # total boom area m^2
-# def br_st(h_st, t_st, w_st):
-#     area_h = w_st * t_st  # horizontal component of stiffeners
-#     area_v = (h_st - t_st) * t_st  # vertical component of stiffeners
-#     return area_h + area_v  # total boom area
-#
-#
-# # function to calculate boom area due to the skin only
-# # sigma1 is this current boom, sigma2 is adjacent boom, t_sk is the thickness of panel, w is width in between
-# # returns b1 #boom area in m^2
-# def br_sk(sigma1, sigma2, t_sk, w):
-#     b1 = (t_sk * w) / 6 * (2 + sigma2 / sigma1)  # idealization to boom area
-#     return b1
->>>>>>> d1e8495c237be9d78d58f47d1c15c3c145b7bb75
-
-
 def axis_transformation(I_zz, I_yy, I_zy, rot_angle):
     # Axis transformation for rotated axis system used for Inertia calculations
     I_uu = (I_zz + I_yy) * 0.5 + (I_zz - I_yy) * 0.5 * cos(2 * rot_angle) - I_zy * sin(2 * rot_angle)
@@ -296,7 +265,7 @@ def iteration(number):
 
 
 #for y in xrange(n):
- #   model.append(iteration(y))
+#   model.append(iteration(y))
     pass
 
 # internal stress and deflection
