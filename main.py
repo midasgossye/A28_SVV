@@ -9,6 +9,7 @@ from math import *
 import unittest
 import scipy.integrate as integrate
 from int_stress_and_defl import *
+import internal_shear_and_moment as intsm
 
 # Global variables
 C_a = 0.515  # Chord length aileron [m]
@@ -99,7 +100,7 @@ def stif_loc(h, t_sk, n_st):
 def torsional_constant(h, t_sk, C_a):
     midcircle_perim = pi * (0.5 * h - 0.5 * t_sk)  # wall mid line perimeter circular
     midtriangle_perim = 2 * (
-        sqrt((0.5 * h - t_sk) ** 2 + (C_a - 0.5 * h - t_sk) ** 2) - 0.5 * t_sk)  # wall mid line perimeter triangle
+            sqrt((0.5 * h - t_sk) ** 2 + (C_a - 0.5 * h - t_sk) ** 2) - 0.5 * t_sk)  # wall mid line perimeter triangle
     p = midcircle_perim + midtriangle_perim  # wall mid line perimeter
     AeC, AeT = enc_area(h, C_a, t_sk)  # enclosed area of circular part and triangle part
     Ae = AeC + AeT  # total enclosed area
@@ -168,7 +169,6 @@ def moment_of_inertia(z_y_angle_coords, t_st, h_st, w_st, t_sp, h, theta):
 
     # === Semi_circle Moment of inertia:
 
-
     I_zz_s_circ = integrate.quad(lambda x: t_sk * ((0.5 * h * sin(x)) ** 2) * 0.5 * h, -pi / 2, pi / 2)[0]
 
     I_yy_s_circ = I_zz_s_circ
@@ -233,7 +233,6 @@ def boom_area_calc(stif_loc, t_st, h_st, w_st, t_sp, h):
     sigma_ratio = -1
     B_spar_end = ((t_sp * (h - 2 * t_sk)) / 6) * (2 + sigma_ratio)
 
-    
     # returns an array with all stiffener boom area's and the value of the spar end_cap area
     # 0-th boom is boom at LE, 1st 
     return B_i_arr, B_spar_end
@@ -252,7 +251,6 @@ b_sp = []
 b_r, b_sp = boom_area_calc(stif_data, t_st, h_st, w_st, t_sp,
                            h)  # b_r is the list off stiffener boom areas, b_sp for spar(single value in m^2)
 
-
 J = torsional_constant(h, t_sk, C_a)
 # crosssection
 A = sum(cross_section(h, C_a, t_sk, t_sp, n_st, w_st, t_st, h_st))  # A is sum of cross section
@@ -263,23 +261,24 @@ I_zz_br, I_yy_br, I_zz, I_yy, I_zy = moment_of_inertia(stif_data, t_st, h_st, w_
 enclosed = sum(enc_area(h, C_a, t_sk))  # enclosed area size
 
 model = []  # whole model
-section_length = section_number
+section_length = l_a / section_number
+
+
 # TODO:under construction
 def iteration(section_number):
-
-    x_start = section_number *
+    x_start = section_number * section_length
     # normal stress
     sigma_boom = []
-    mid_x_pos =
+    mid_x_pos = x_start + section_length / 2
+    M, V = intsm.internal(mid_x_pos)
     for i in xrange(len(stif_data)):
-
-        sigma_boom.append(norm_strs(M_z, I_z_z, y))
+        sigma_boom.append(norm_strs(M, I_zz_br, stif_data[i][1]))
+    
     return None
 
 
 for y in xrange(n):
     model.append(iteration(y))
-
 
 
 # internal stress and deflection
