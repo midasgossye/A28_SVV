@@ -266,7 +266,7 @@ spacing = total_perimeter / ((n_st + 1) / 2)
 # calculating the stiffeners' total boom area
 b_st = []
 b_sp = []
-# b_st, b_sp = boom
+b_st, b_sp = boom_area_calc(stif_data, t_st, h_st, w_st, t_sp, h)
 b_r.append()
 # b_r.append(br_st(h_st, t_st, w_st))  # boom at neutral axis
 # for a in xrange(
@@ -290,9 +290,9 @@ model = []  # whole model
 def iteration(number):
 
 
-for y in xrange(n):
-    model.append(iteration(y))
-
+#for y in xrange(n):
+ #   model.append(iteration(y))
+    pass
 
 # internal stress and deflection
 
