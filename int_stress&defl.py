@@ -26,12 +26,12 @@ def defl(M_x, I_z_z, E):
 # returns d(theta)/dz
 def ROT(A, G, t, q_s):
     s = 11
-    dTheta = 1 / (2 * A) * intg.quad(q_s / G / t, 0, s)
+    dTheta = q_s / (2 * A) * intg.quad(G / t, 0, s)
     return dTheta
 
 
 # maximum deflection
 def maxdefl(dTheta, v, LEdist, TEdist, z):
-    leading = dTheta * z * LEdist - v
+    leading = dTheta * z * LEdist
     trailing = dTheta * z * TEdist + v
     return leading, trailing

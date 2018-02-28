@@ -225,18 +225,22 @@ circle_perim = 0.5 * pi * (0.5 * h - t_sk)
 total_perimeter = circle_perim + sqrt((0.5 * h - t_sk) ** 2 + (C_a - 0.5 * h - t_sk) ** 2)  # m
 spacing = total_perimeter / ((n_st + 1) / 2)
 # calculating the stiffeners' total boom area
-b_r.append(br_st(h_st, t_st, w_st))  # boom at neutral axis
-for a in xrange(
-                n_st - 3):  # iterate 0-8, 9 is special case at LE, 10 is TE calculated separately to prevent list out of bounds
-    i = a + 1  # ignoring the number 0 stiffener at the neutral axis at LE, done before loop
-    totalboomarea = br_st(h_st, t_st, w_st) + br_sk(stif_data[i][1], stif_data[i + 2][1], t_sk, spacing)
-    b_r.append(totalboomarea)
-totalboomareanine = br_st(h_st, t_st, w_st) + br_sk(stif_data[1][1], stif_data[2][1], t_sk,
-                                                    spacing * 2)  # 9 special case
-lasttotalboomarea = br_st(h_st, t_st, w_st) + br_sk(stif_data[n_st - 2][1], stif_data[n_st - 1][1], t_sk,
-                                                    spacing)  # 10 special case
-b_r.append(totalboomareanine)
-b_r.append(lasttotalboomarea)
+b_st = []
+b_sp = []
+# b_st, b_sp = boom
+b_r.append()
+# b_r.append(br_st(h_st, t_st, w_st))  # boom at neutral axis
+# for a in xrange(
+#                 n_st - 3):  # iterate 0-8, 9 is special case at LE, 10 is TE calculated separately to prevent list out of bounds
+#     i = a + 1  # ignoring the number 0 stiffener at the neutral axis at LE, done before loop
+#     totalboomarea = br_st(h_st, t_st, w_st) + br_sk(stif_data[i][1], stif_data[i + 2][1], t_sk, spacing)
+#     b_r.append(totalboomarea)
+# totalboomareanine = br_st(h_st, t_st, w_st) + br_sk(stif_data[1][1], stif_data[2][1], t_sk,
+#                                                     spacing * 2)  # 9 special case
+# lasttotalboomarea = br_st(h_st, t_st, w_st) + br_sk(stif_data[n_st - 2][1], stif_data[n_st - 1][1], t_sk,
+#                                                     spacing)  # 10 special case
+# b_r.append(totalboomareanine)
+# b_r.append(lasttotalboomarea)
 # torsional stiffness
 J = torsional_constant(h, t_sk, C_a)
 # crosssection
