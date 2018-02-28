@@ -8,7 +8,7 @@ Created on Mon Feb 19 14:07:00 2018
 from math import *
 import unittest
 import scipy.integrate as integrate
-import int_stress&defl.py as int_stress
+from int_stress_and_defl import *
 
 # Global variables
 C_a = 0.515  # Chord length aileron [m]
@@ -283,7 +283,7 @@ model = []  # whole model
 def iteration(section_number):
     # normal stress
     sigma_boom = []
-    for i in len(stif_data):
+    for i in xrange(len(stif_data)):
         sigma_boom.append(norm_strs(M_z, I_z_z, y))
     return None
 
