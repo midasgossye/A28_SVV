@@ -17,4 +17,9 @@ total_perimeter = circle_perim + sqrt((0.5 * h - t_sk) ** 2 + (C_a - 0.5 * h - t
 
 spacing = total_perimeter / ((n_st + 1) / 2)
 
-lengths = [spacing, spacing, spacing, spacing, total_perimeter - circle_perim - 4*spacing, 5*spacing - (total_perimeter - circle_perim), spacing, spacing, 5*spacing - (total_perimeter - circle_perim), total_perimeter - circle_perim - 4*spacing, spacing, spacing , spacing, spacing, h] 
+
+def lengths():
+    return [spacing, spacing, spacing, spacing, total_perimeter - circle_perim - 4 * spacing,
+            5 * spacing - (total_perimeter - circle_perim), spacing, spacing,
+            5 * spacing - (total_perimeter - circle_perim), total_perimeter - circle_perim - 4 * spacing, spacing,
+            spacing, spacing, spacing, h]
