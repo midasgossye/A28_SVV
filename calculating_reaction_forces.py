@@ -3,59 +3,61 @@ from math import *
 from scipy.linalg import solve
 import sympy as sp
 
-#----------------------------------------------------------------
-#Program will return the 6 unknown reaction forces.
+# ----------------------------------------------------------------
+# Program will return the 6 unknown reaction forces.
 
 
-#----------------------------------------------------------------
-#----DEFINE CONSTANTS--------------------------------------------
-#----------------------------------------------------------------
+# ----------------------------------------------------------------
+# ----DEFINE CONSTANTS--------------------------------------------
+# ----------------------------------------------------------------
 
-#----Given constants---------------------------------------------
+# ----Given constants---------------------------------------------
 
-P = 20.6*10**(3)    #N
-q = 1.00*10**(3)    #N/m
-C_a = 0.515         #m
-l_a = 2.691         #m
-x_1 = 0.174         #m
-x_2 = 1.051         #m
-x_3 = 2.512         #m
-x_a = 0.3           #m
-h = 0.248           #m
-theta = 25*pi/180   #radians
-f_s = 0.4           # assumed form factor for cross section
-A  = 0.0021108225743942223                                        # cross sectional area [m2]
-G = 28*10**9        #shear modulus aluminum 2014-T3 [Pa]
-d_1 = 0.134         #m
-d_3 = 0.2066        #m
-E = 73.1*10**9      #Pa
-I = 1.5258310691614982e-05  #m**4  (Izz) # input MMOI
+P = 20.6 * 10 ** (3)  # N
+q = 1.00 * 10 ** (3)  # N/m
+C_a = 0.515  # m
+l_a = 2.691  # m
+x_1 = 0.174  # m
+x_2 = 1.051  # m
+x_3 = 2.512  # m
+x_a = 0.3  # m
+h = 0.248  # m
+theta = 25 * pi / 180  # radians
+f_s = 0.4  # assumed form factor for cross section
+A = 0.0021108225743942223  # cross sectional area [m2]
+G = 28 * 10 ** 9  # shear modulus aluminum 2014-T3 [Pa]
+d_1 = 0.134  # m
+d_3 = 0.2066  # m
+E = 73.1 * 10 ** 9  # Pa
+I = 1.5258310691614982e-05  # m**4  (Izz) # input MMOI
 
-#----Calculating distances---------------------------------------
+# ----Calculating distances---------------------------------------
 
-y_hingeline = h/2*sin((pi/2)-theta) - h/2*sin(theta)        #m
-z_hingeline = (0.25*C_a-h/2)*cos(theta)                     #m
-z_star = h/2*cos(theta)                                     #m
+y_hingeline = h / 2 * sin((pi / 2) - theta) - h / 2 * sin(theta)  # m
+z_hingeline = (0.25 * C_a - h / 2) * cos(theta)  # m
+z_star = h / 2 * cos(theta)  # m
 
-#print y_hingeline
-#print z_hingeline
-#print z_star
+# print y_hingeline
+# print z_hingeline
+# print z_star
 
-#----------------------------------------------------------------
-#----GOVERNING EQUATIONS-----------------------------------------
-#----------------------------------------------------------------
+# ----------------------------------------------------------------
+# ----GOVERNING EQUATIONS-----------------------------------------
+# ----------------------------------------------------------------
 
-#Castigliano's theorem: Internal complimentary energy for bending only:
-#---------------------------------------------------------------
+# Castigliano's theorem: Internal complimentary energy for bending only:
+# ---------------------------------------------------------------
 
-#Define every unknown constant as an algebraic symbol:
+# Define every unknown constant as an algebraic symbol:
 H_1_y = sp.Symbol('H_1_y')
 H_2_y = sp.Symbol('H_2_y')
 H_3_y = sp.Symbol('H_3_y')
-#q = sp.Symbol('q')
+# q = sp.Symbol('q')
 x = sp.Symbol('x')
-#I = sp.Symbol('I')
-#E = sp.Symbol('E')
+
+
+# I = sp.Symbol('I')
+# E = sp.Symbol('E')
 
 # #Squared bending moment equations for different sections of the beam
 # m_1 = (-q*x**2/2)**2                            #for 0<x<x_1                                #for 0<x<x_1
@@ -183,22 +185,19 @@ def calc_reac_f(Izz):
     # Matrix A consists of H_1,y    H_1,z   H_2,y     H_2,z    H_3,y    A_1,z #output
     # Matrix B consists of the known values on the right side of the governing equations
     # sixth equation is castigliano's
-    A = np.matrix([[1, 0, 1, 0, 1, 0],  # Matrix including the equilibruim equations with unknown reaction forces
+    matA = np.matrix([[1, 0, 1, 0, 1, 0],  # Matrix including the equilibruim equations with unknown reaction forces
                    [0, 1, 0, 1, 0, 1],
                    [0, 0, 0, 0, 0, y_hingeline],
                    [0, -x_1, 0, -x_2, 0, -(x_2 - x_a / 2)],
                    [x_1, 0, x_2, 0, x_3, 0],
                    [1.9695 * 10 ** -6, 0, 2.87622 * 10 ** -6, 0, 4.38789 * 10 ** -7, 0]])
 
-    B = np.matrix([[q * l_a],  # Matrix inlcuding the right side of the equilibrium equations, all the known forces
+    matB = np.matrix([[q * l_a],  # Matrix inlcuding the right side of the equilibrium equations, all the known forces
                    [P],
                    [q * l_a * z_hingeline + P * y_hingeline],
                    [-P * (x_2 + x_a / 2)],
                    [q * l_a ** (2) / 2],
                    [0.13843]])
     # outputs 6 variables H_1_y, H_1_z, H_2_y, H_2_z, H_3_y, A_1_z
-    forces = solve(A, B)
+    forces = solve(matA, matB)
     return forces
-
-
-
