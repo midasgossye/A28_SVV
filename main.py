@@ -38,7 +38,7 @@ n = 1000  # sections to be analysed
 datax = [0.175, 0.902, 1.052, 1.202, 2.513]
 dataptx = []
 for i in xrange(len(datax)):
-    dataptx.append = datax[i] / l_a * 1000
+    dataptx.append(int(datax[i] / l_a * 1000))
 print dataptx
 
 
@@ -270,6 +270,8 @@ enclosed = sum(enc_area(h, C_a, t_sk))  # enclosed area size
 
 model = []  # whole model
 section_length = l_a / n
+verifdata = []
+qribdata = []
 
 
 # TODO:under construction
@@ -280,14 +282,22 @@ def iteration(section_number):
 
     stif_data = stif_loc(h, t_sk, n_st)
     bir, bisp = boom_area_calc(stif_data, t_st, h_st, w_st, t_sp, h)
-    totshearvalue = totshear.totalshear(stif_data, V_zpr, V_ypr, bir, bisp, I_zz_br, I_yy_br)
-    print totshearvalue
+    totshearvalue, qrib = totshear.totalshear(stif_data, V_zpr, V_ypr, bir, bisp, I_zz_br, I_yy_br)
+    verifdata.append(totshearvalue[7])
+    verifdata.append(totshearvalue[9])
+    verifdata.append(totshearvalue[0])
+    verifdata.append(totshearvalue[5])
+    qribdata.append(qrib)
+    # print "section: ",section_number,"at x: ", mid
+    # print totshearvalue
+    # print qrib
     return
 
 
 for i in xrange(len(dataptx)):
     iteration(dataptx[i])
-
+verifdata += qribdata
+print verifdata
 # print I_zz_br, I_yy_br
 
 # x_start = 0 * section_length
@@ -306,7 +316,7 @@ M, V_y, V_z, V_ypr, V_zpr = intsm.internal(mid, I_zz)
 stif_data = stif_loc(h, t_sk, n_st)
 bir, bisp = boom_area_calc(stif_data, t_st, h_st, w_st, t_sp, h)
 totshearvalue = totshear.totalshear(stif_data, V_zpr, V_ypr, bir, bisp, I_zz_br, I_yy_br)
-print totshearvalue
+# print totshearvalue
 
 # for y in xrange(n):
 #     model.append(iteration(y))

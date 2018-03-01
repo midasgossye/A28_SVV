@@ -50,7 +50,7 @@ V_yprime_1 = totalshear[5]*lengths[5]*sin(beta1/2) + totalshear[6]*lengths[6]*si
 V_yprime2 = 0
 for n in [0, 4]:
     Verticalforce = totalshear[n] * lengths[n] * sin(phi)
-    V_yprime2 = V_yprime2 + Vertialforce
+    V_yprime2 = V_yprime2 + Verticalforce
 for n in [9, 13]:
     Verticalforce = totalshear[n] * lengths[n] * sin(phi)
     V_yprime2 = V_yprime2 + Verticalforce
@@ -91,3 +91,4 @@ Rib_force = V_yprime2 - K_d_vertical - K_b_vertical
 
 #Finally, compute the shear flow in the ribs
 q_ribs = Rib_force/h    #N/m
+
