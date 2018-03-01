@@ -270,7 +270,7 @@ def iteration(section_number):
     # normal stress
     sigma_boom = []
     mid_x_pos = x_start + section_length / 2
-    M, V = intsm.internal(mid_x_pos, I_zz)
+    M, V_y, V_z = intsm.internal(mid_x_pos, I_zz)
     for i in xrange(len(stif_data)):
         sigma_boom.append(norm_strs(M, I_zz_br, stif_data[i][1]))
 
@@ -303,7 +303,7 @@ class TestGeoPropFunctions(unittest.TestCase):
         self.assertLess(sum(enc_area(1, 1, 0)), 1)  # selfdone test
         # self.assertAlmostEqual(sum(enc_area(h, C_a, t_sk)), ()) #verification
 
-    def test_stifloc(self):
+    # def test_stifloc(self):
 
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestGeoPropFunctions)
