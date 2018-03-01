@@ -10,6 +10,7 @@ import unittest
 import scipy.integrate as integrate
 from int_stress_and_defl import *
 import internal_shear_and_moment as intsm
+import total_shear_calc as totshear
 
 # Global variables
 C_a = 0.515  # Chord length aileron [m]
@@ -31,7 +32,7 @@ theta = 25  # Maximum upward deflection [deg]
 P = 20.6 * 10 ** 3  # Load in actuator 2 [N]
 q = 1.00 * 10 ** 3  # Net aerodynamic load [N/m]
 G = 28 * 10 ** 9  # Shear modulus in Pa (28 GPa, source: http://asm.matweb.com/search/SpecificMaterial.asp?bassnum=ma2024t3)
-n = 20  # sections to be analysed
+n = 270  # sections to be analysed
 
 
 # functions
@@ -264,7 +265,6 @@ model = []  # whole model
 section_length = l_a / n
 
 
-
 # TODO:under construction
 def iteration(section_number):
     x_start = section_number * section_length
@@ -277,7 +277,27 @@ def iteration(section_number):
 
     return None
 
-print boom_area_calc(stif_loc(h, t_sk, n_st), t_st, h_st, w_st, t_sp, h)
+
+# print I_zz_br, I_yy_br
+
+x_start = 0 * section_length
+mid = x_start + section_length / 2
+M, V_y, V_z, V_ypr, V_zpr = intsm.internal(mid, I_zz)
+
+stif_data = stif_loc(h, t_sk, n_st)
+bir, bisp = boom_area_calc(stif_data, t_st, h_st, w_st, t_sp,
+                           h)
+totshearvalue = totshear.totalshear(stif_data, V_zpr, V_ypr, bir, bisp, I_zz_br, I_yy_br)
+print totshearvalue
+x_start = 135 * section_length
+mid = x_start + section_length / 2
+M, V_y, V_z, V_ypr, V_zpr = intsm.internal(mid, I_zz)
+
+stif_data = stif_loc(h, t_sk, n_st)
+bir, bisp = boom_area_calc(stif_data, t_st, h_st, w_st, t_sp,
+                           h)
+totshearvalue = totshear.totalshear(stif_data, V_zpr, V_ypr, bir, bisp, I_zz_br, I_yy_br)
+print totshearvalue
 
 # for y in xrange(n):
 #     model.append(iteration(y))
@@ -290,5 +310,3 @@ print boom_area_calc(stif_loc(h, t_sk, n_st), t_st, h_st, w_st, t_sp, h)
 # print "stiff location print:", stif_loc(h, t_sk, n_st)
 # print "torsional constant", torsional_constant(h, t_sk, C_a)
 # testunits for unittests
-
-
