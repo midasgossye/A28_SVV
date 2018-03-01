@@ -264,6 +264,7 @@ model = []  # whole model
 section_length = l_a / n
 
 
+
 # TODO:under construction
 def iteration(section_number):
     x_start = section_number * section_length
@@ -276,6 +277,7 @@ def iteration(section_number):
 
     return None
 
+print boom_area_calc(stif_loc(h, t_sk, n_st), t_st, h_st, w_st, t_sp, h)
 
 # for y in xrange(n):
 #     model.append(iteration(y))
@@ -290,21 +292,3 @@ def iteration(section_number):
 # testunits for unittests
 
 
-class TestGeoPropFunctions(unittest.TestCase):
-    def test_Xsection(self):
-        self.assertEqual(cross_section(0, 0, 0, 0, 0, 0, 0, 0), (0, 0, 0, 0))  # zero test
-        # self.assertAlmostEqual(sum(cross_section(h, C_a, t_sk, t_sp, 11, w_st, t_st, h_st)), 0.002, places=None,
-        #                        msg=None, delta=(0.002 / 10))  # test data from catia model
-        self.assertAlmostEqual(sum(cross_section(h, C_a, t_sk, t_sp, 0, w_st, t_st, h_st)), 0.002,
-                               places=3)  # no stiffeners
-
-    def test_enc_area(self):
-        self.assertEqual(enc_area(0, 0, 0), (0, 0))  # zero test
-        self.assertLess(sum(enc_area(1, 1, 0)), 1)  # selfdone test
-        # self.assertAlmostEqual(sum(enc_area(h, C_a, t_sk)), ()) #verification
-
-    # def test_stifloc(self):
-
-
-suite = unittest.TestLoader().loadTestsFromTestCase(TestGeoPropFunctions)
-unittest.TextTestRunner(verbosity=2).run(suite)
