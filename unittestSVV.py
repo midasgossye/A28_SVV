@@ -21,7 +21,7 @@ class TestGeoPropFunctions(unittest.TestCase):
         # self.assertAlmostEqual(sum(enc_area(h, C_a, t_sk)), ()) #verification
 
     # def test_stifloc(self):
-
+    #     self.assertAlmostEqual(stif_loc(h, t_sk, n_st)[],)
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestGeoPropFunctions)
 unittest.TextTestRunner(verbosity=2).run(suite)
