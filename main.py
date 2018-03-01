@@ -11,8 +11,6 @@ import scipy.integrate as integrate
 from int_stress_and_defl import *
 import internal_shear_and_moment as intsm
 
-
-
 # Global variables
 C_a = 0.515  # Chord length aileron [m]
 l_a = 2.691  # Span of the aileron [m]
@@ -301,12 +299,11 @@ class TestGeoPropFunctions(unittest.TestCase):
                                places=3)  # no stiffeners
 
     def test_enc_area(self):
-        self.assertEqual(enc_area(0, 0, 0), (0, 0)) #zero test
-        self.assertLess(sum(enc_area(1, 1, 0)), 1) #selfdone test
+        self.assertEqual(enc_area(0, 0, 0), (0, 0))  # zero test
+        self.assertLess(sum(enc_area(1, 1, 0)), 1)  # selfdone test
         # self.assertAlmostEqual(sum(enc_area(h, C_a, t_sk)), ()) #verification
 
     def test_stifloc(self):
-        
 
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestGeoPropFunctions)
