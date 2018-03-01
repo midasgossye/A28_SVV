@@ -11,6 +11,8 @@ import scipy.integrate as integrate
 from int_stress_and_defl import *
 import internal_shear_and_moment as intsm
 
+
+
 # Global variables
 C_a = 0.515  # Chord length aileron [m]
 l_a = 2.691  # Span of the aileron [m]
@@ -277,8 +279,8 @@ def iteration(section_number):
     return None
 
 
-for y in xrange(n):
-    model.append(iteration(y))
+# for y in xrange(n):
+#     model.append(iteration(y))
 
 
 # internal stress and deflection
@@ -297,6 +299,14 @@ class TestGeoPropFunctions(unittest.TestCase):
         #                        msg=None, delta=(0.002 / 10))  # test data from catia model
         self.assertAlmostEqual(sum(cross_section(h, C_a, t_sk, t_sp, 0, w_st, t_st, h_st)), 0.002,
                                places=3)  # no stiffeners
+
+    def test_enc_area(self):
+        self.assertEqual(enc_area(0, 0, 0), (0, 0)) #zero test
+        self.assertLess(sum(enc_area(1, 1, 0)), 1) #selfdone test
+        # self.assertAlmostEqual(sum(enc_area(h, C_a, t_sk)), ()) #verification
+
+    def test_stifloc(self):
+        
 
 
 suite = unittest.TestLoader().loadTestsFromTestCase(TestGeoPropFunctions)
