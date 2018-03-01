@@ -7,7 +7,9 @@ from math import *
 # ------------------------------------------
 # Everything is in the x,y-plane
 
+
 # -------Defining constants-----------------
+
 l_a = 2.691  # m
 x_1 = 0.174  # m
 x_2 = 1.051  # m
@@ -15,8 +17,9 @@ x_3 = 2.512  # m
 x_a = 0.3  # m
 q = 1.00 * 10 ** 3  # N/m
 P = -20.6 * 10 ** 3  # N
-theta = radians(25)
+
 step = 0.00001  # m
+theta = radians(25)
 
 H_1_y = -55704.98965647  # N
 H_1_z = -7079.78619831  # N

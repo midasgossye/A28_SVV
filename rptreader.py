@@ -6,10 +6,13 @@ from math import *
 
 # functions
 # main
+# Node Label    RF.Magnitude          RF.RF1          RF.RF2          RF.RF3     U.Magnitude            U.U1            U.U2            U.U3
 DO228N_ULC1 = np.genfromtxt("Do228n_ULC1.rpt", skip_header=19, max_rows=6156)
 DO228N_ULC1 = np.transpose(DO228N_ULC1)
 DO228N_ULC1ft = np.genfromtxt("Do228n_ULC1.rpt", skip_header=6191, max_rows=16)
 DO228N_ULC1ft = np.transpose(DO228N_ULC1ft)
+# Element Label      Node Label         S.Mises         S.Mises
+#                                           @Loc 1          @Loc 2
 DO228N_SLC1_1 = np.genfromtxt("Do228n_SLC1.rpt", skip_header=23, max_rows=6848)
 DO228N_SLC1_1 = np.transpose(DO228N_SLC1_1)
 DO228N_SLC1_2 = np.genfromtxt("Do228n_SLC1.rpt", skip_header=6892, max_rows=4280)
@@ -21,6 +24,9 @@ DO228N_SLC1_4 = np.transpose(DO228N_SLC1_4)
 
 inp = np.genfromtxt("Do228n.inp", delimiter=",", comments="*", max_rows=6156)  # nodenumber, x, y, z
 inp = np.transpose(inp)
+
+
+
 # print max(inp[1])
 # print min(inp[1])
 
