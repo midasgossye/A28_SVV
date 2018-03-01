@@ -38,6 +38,7 @@ phi = 0.3071        #radians, the angle between the symmetry axis and the top or
 #----CALCULATING SHEAR FLOW IN RIBS------------------------------
 #----------------------------------------------------------------
 
+#EVERYTHING LEFT CELL
 #Consider every cell seperately, first the left cell, only in vertical direction
 #beta 1 is half the angle between spar and boom 2, beta 2 is half the angle between boom 2 and boom 0
 beta1 = (lengths[5]/(h/2))/2
@@ -46,19 +47,23 @@ beta2 = (lengths[6]/(h/2))/2
 #calculate the vertical force due to the total shearflows in the left cell
 V_yprime_1 = totalshear[5]*lengths[5]*sin(beta1/2) + totalshear[6]*lengths[6]*sin(beta2/2) + totalshear[7]*lengths[7]*sin(beta2/2) + totalshear[8]*lengths[9]*sin(beta1/2)
 
+#Calculate the force in the ribs in the left cell
+F_ribs_left = V_prime_1 - S_yprime      #N
+
+#Calculate the shear flow in the left cell
+q_ribs_leftcell = R_ribs_left/h     #N/m
+
+
+#EVERYTHING RIGHT CELL
+#Calculate the forces carried by the flanges in cell 2, by taking moment around point 1, clockwise positive
 #Calculate the vertical due to the total shearflows in the right cell
 V_yprime2 = 0
 for n in [0, 4]:
     Verticalforce = totalshear[n] * lengths[n] * sin(phi)
-    V_yprime2 = V_yprime2 + Verticalforce
+    V_yprime2 = V_yprime2 + Vertialforce
 for n in [9, 13]:
     Verticalforce = totalshear[n] * lengths[n] * sin(phi)
     V_yprime2 = V_yprime2 + Verticalforce
-
-#Calculate the force in the ribs in the left cell
-F_ribs_left = V_prime_1 - S_yprime      #N
-
-#Calculate the forces carried by the flanges in cell 2, by taking moment around point 1, clockwise positive
 #Start with calculating the force per shear section
 forcesperboom = []
 for n in [0, 4]:
@@ -86,9 +91,8 @@ K_d_vertical = K_d*tan(phi)
 #Calculate the vertical component of K_b, by taking equilibrium in the z' direction of the external forces only
 K_b_vertical = -K_d_vertical
 
-#Compute force carried by rib
+#Compute force carried by rib in the right cell
 Rib_force = V_yprime2 - K_d_vertical - K_b_vertical
 
-#Finally, compute the shear flow in the ribs
-q_ribs = Rib_force/h    #N/m
-
+#Finally, compute the shear flow in the ribs in the right cell
+q_ribs_rightcell = Rib_force/h    #N/m
