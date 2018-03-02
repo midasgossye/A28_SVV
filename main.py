@@ -39,7 +39,7 @@ datax = [0.175, 0.902, 1.052, 1.202, 2.513]
 dataptx = []
 for i in xrange(len(datax)):
     dataptx.append(int(datax[i] / l_a * 1000))
-print dataptx
+print dataptx, "<--- positions are from 1000 sections"
 
 
 # functions
@@ -116,6 +116,7 @@ def torsional_constant(h, t_sk, C_a):
     J = (4 * Ae ** 2 * t_sk) / p
 
     return J  # torsional constant
+
 
 # function for transforming axis to a rotated version
 # input MMOI I_zz, I_yy, I_zy, and rotation angle rot_angle
@@ -217,9 +218,10 @@ def moment_of_inertia(z_y_angle_coords, t_st, h_st, w_st, t_sp, h, theta):
     # NOTE: All reported values are in m^4
     return TOT_I_zz_br, TOT_I_yy_br, TOT_I_zz, TOT_I_yy, TOT_I_zy
 
+
 # calculates boom area
 # input stiffener loaction, thickness stiffeners, height stiffeners,width stiffeners, thickness spar, height
-
+# outputs boom_arear of booms in a list b_i_arr, b_i_spar
 def boom_area_calc(stif_loc, t_st, h_st, w_st, t_sp, h):
     A_st = w_st * t_st + (h_st - t_st) * t_st
 
@@ -292,8 +294,8 @@ def iteration(section_number):
     verifdata.append(totshearvalue[9])
     verifdata.append(totshearvalue[0])
     verifdata.append(totshearvalue[5])
-    qribdata.append(qrib[0])
-    qribdata.append(qrib[1])
+    # qribdata.append(qrib[0])
+    # qribdata.append(qrib[1])
     # print "section: ",section_number,"at x: ", mid
     # print totshearvalue
     # print qrib
