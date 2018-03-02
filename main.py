@@ -35,12 +35,12 @@ theta = 25  # Maximum upward deflection [deg]
 P = 20.6 * 10 ** 3  # Load in actuator 2 [N]
 q = 1.00 * 10 ** 3  # Net aerodynamic load [N/m]
 G = 28 * 10 ** 9  # Shear modulus in Pa (28 GPa, source: http://asm.matweb.com/search/SpecificMaterial.asp?bassnum=ma2024t3)
-n = 1000  # sections to be analysed
+n = 270  # sections to be analysed
 
 datax = [0.175, 0.902, 1.052, 1.202, 2.513]
 dataptx = []
 for i in xrange(len(datax)):
-    dataptx.append(int(datax[i] / l_a * 1000))
+    dataptx.append(int(datax[i] / l_a * n))
 print dataptx, "<--- positions are from 1000 sections"
 
 E = 71 * 10 ** 9
@@ -366,13 +366,14 @@ x_coor = Moment_data[:, 0]
 I_bend = 6.385385647322895e-05
 M_x = Moment_data[:, 1]
 
-x_coor, plot_arr = plot_numerical_bending(I_bend, x_coor, M_x, E)
-file_n = open("defl_data_z.txt", "w")
-
-for i in xrange(len(plot_arr)):
-    file_n.write(str(plot_arr[i]))
-    file_n.write("\n")
-file_n.close()
+#TODO: uncomment at end
+# x_coor, plot_arr = plot_numerical_bending(I_bend, x_coor, M_x, E)
+# file_n = open("defl_data_z.txt", "w")
+#
+# for i in xrange(len(plot_arr)):
+#     file_n.write(str(plot_arr[i]))
+#     file_n.write("\n")
+# file_n.close()
 
 # print "Moments: (I_z'z', I_y'y', I_zz, I_yy, I_zy) All in m^4"
 # print moment_of_inertia(stif_loc(h, t_sk, n_st), t_st, h_st, w_st, t_sp, h, theta)
@@ -424,12 +425,12 @@ def iteration(section_number):
     return
 
 
-plot_numerical_bending(I_zz, x_coor, Moment_data, E)
-plot_numerical_bending(I_yy, x_coor, Moment_data, E)
 for i in xrange(len(dataptx)):
     iteration(dataptx[i])
 verifdata += qribdata
 print verifdata
+
+
 # print I_zz_br, I_yy_br
 
 # x_start = 0 * section_length
@@ -441,7 +442,7 @@ print verifdata
 # totshearvalue = totshear.totalshear(stif_data, V_zpr, V_ypr, bir, bisp, I_zz_br, I_yy_br)
 # print totshearvalue
 
-x_start = 500 * section_length
+x_start = n / 2 * section_length
 mid = x_start + section_length / 2
 M, V_y, V_z, V_ypr, V_zpr = intsm.internal(mid, I_zz)
 
