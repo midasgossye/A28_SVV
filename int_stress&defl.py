@@ -27,7 +27,7 @@ def defl(M_x, I_z_z, E):
 def ROT(A, G, t, q_s, s):
     dTheta = q_s / (2 * A) * intg.quad(G / t, 0, s)
     return dTheta
-
+    
 # TODO check this
 # maximum deflection
 def maxdefl(dTheta, v, LEdist, TEdist, z):
