@@ -10,27 +10,38 @@ import unittest
 import scipy.integrate as integrate
 import numpy as np
 from matplotlib import pyplot as plt
+
+from int_stress_and_defl import *
+import internal_shear_and_moment as intsm
+import total_shear_calc as totshear
+
 # Global variables
-C_a = 0.515                 # Chord length aileron [m]
-l_a = 2.691                 # Span of the aileron [m]
-x_1 = 0.174                 # x-location of hinge 1 [m]
-x_2 = 1.051                 # x-location of hinge 2 [m]
-x_3 = 2.512                 # x-location of hinge 3 [m]
-x_a = 0.300                 # Distance between actuator 1 and 2 [m]
-h = 0.248                   # Aileron height [m]
-t_sk = 1.1 * 10 ** (-3)     # Skin thickness [m]
-t_sp = 2.2 * 10 ** (-3)     # Spar thickness [m]
-t_st = 1.2 * 10 ** (-3)     # Thickness of stiffener [m]
-h_st = 1.5 * 10 ** (-2)     # Height of stiffener [m]
-w_st = 3.0 * 10 ** (-2)     # Width of stiffener [m]
-n_st = 11                   # Number of stiffeners [-]
-d_1 = 10.34 * 10 ** (-2)    # Vertical displacement hinge 1 [m]
-d_3 = 20.66 * 10 ** (-2)    # Vertical displacement hinge 3 [m]
-theta = 25                  # Maximum upward deflection [deg]
-P = 20.6 * 10 ** 3          # Load in actuator 2 [N]
-q = 1.00 * 10 ** 3          # Net aerodynamic load [N/m]
-G = 28 * 10 ** 9            # Shear modulus in Pa (28 GPa, source: http://asm.matweb.com/search/SpecificMaterial.asp?bassnum=ma2024t3)
-n = 20                      # sections to be analysed
+C_a = 0.515  # Chord length aileron [m]
+l_a = 2.691  # Span of the aileron [m]
+x_1 = 0.174  # x-location of hinge 1 [m]
+x_2 = 1.051  # x-location of hinge 2 [m]
+x_3 = 2.512  # x-location of hinge 3 [m]
+x_a = 0.300  # Distance between actuator 1 and 2 [m]
+h = 0.248  # Aileron height [m]
+t_sk = 1.1 * 10 ** (-3)  # Skin thickness [m]
+t_sp = 2.2 * 10 ** (-3)  # Spar thickness [m]
+t_st = 1.2 * 10 ** (-3)  # Thickness of stiffener [m]
+h_st = 1.5 * 10 ** (-2)  # Height of stiffener [m]
+w_st = 3.0 * 10 ** (-2)  # Width of stiffener [m]
+n_st = 11  # Number of stiffeners [-]
+d_1 = 10.34 * 10 ** (-2)  # Vertical displacement hinge 1 [m]
+d_3 = 20.66 * 10 ** (-2)  # Vertical displacement hinge 3 [m]
+theta = 25  # Maximum upward deflection [deg]
+P = 20.6 * 10 ** 3  # Load in actuator 2 [N]
+q = 1.00 * 10 ** 3  # Net aerodynamic load [N/m]
+G = 28 * 10 ** 9  # Shear modulus in Pa (28 GPa, source: http://asm.matweb.com/search/SpecificMaterial.asp?bassnum=ma2024t3)
+n = 1000  # sections to be analysed
+
+datax = [0.175, 0.902, 1.052, 1.202, 2.513]
+dataptx = []
+for i in xrange(len(datax)):
+    dataptx.append(int(datax[i] / l_a * 1000))
+print dataptx
 
 E = 71*10**9
 
@@ -53,7 +64,8 @@ def cross_section(ha,ca , tskin, tspar, stiffener_amount, w_stiffener, t_stiffen
 
 
 # calculating the enclosed cross sectional area
-# returns A_1, A_2 #areas m^2
+# input height aileron ha, chord length aileron ca, thickness tskin
+# returns Circular section enclosed area A_1, Triangular section enclosed area A_2 #areas m^2
 def enc_area(ha, ca, tskin):
     A_1 = 0.5 * pi * ((ha - (1 * tskin)) / 2) ** 2  # Circular section enclosed area
     A_2 = 0.5 * (ha - 1 * tskin) * (ca - 0.5 * ha - tskin)  # Triangular section enclosed area
@@ -89,18 +101,20 @@ def stif_loc(h, t_sk, n_st):
             apnd_itm = (z_coordinate, -y_coordinate, -rot_angle)
             z_y_angle_coords.append(apnd_itm)
 
-        print "Stif.", i, "\t z:", z_coordinate, "\t y:", y_coordinate, "\t angle:", degrees(rot_angle)
 
-    # Coordinates with respect to centre of spar
+        # print "Stif.", i, "\t z:", z_coordinate, "\t y:", y_coordinate, "\t angle:", degrees(rot_angle)
+
+
     return z_y_angle_coords  # [(stringer0 z,y,rot),(stringer1 z,y,rot), ...]
 
 
 # function to calculate torsional constant
+# input height h, thickness skin t_sk, chord length aileron C_a
 # return J  # torsional constant
 def torsional_constant(h, t_sk, C_a):
     midcircle_perim = pi * (0.5 * h - 0.5 * t_sk)  # wall mid line perimeter circular
     midtriangle_perim = 2 * (
-        sqrt((0.5 * h - t_sk) ** 2 + (C_a - 0.5 * h - t_sk) ** 2) - 0.5 * t_sk)  # wall mid line perimeter triangle
+            sqrt((0.5 * h - t_sk) ** 2 + (C_a - 0.5 * h - t_sk) ** 2) - 0.5 * t_sk)  # wall mid line perimeter triangle
     p = midcircle_perim + midtriangle_perim  # wall mid line perimeter
     AeC, AeT = enc_area(h, C_a, t_sk)  # enclosed area of circular part and triangle part
     Ae = AeC + AeT  # total enclosed area
@@ -108,6 +122,9 @@ def torsional_constant(h, t_sk, C_a):
 
     return J  # torsional constant
 
+# function for transforming axis to a rotated version
+# input MMOI I_zz, I_yy, I_zy, and rotation angle rot_angle
+# outputs new rotated I_uu, I_vv, I_uv
 def axis_transformation(I_zz, I_yy, I_zy, rot_angle):
     # Axis transformation for rotated axis system used for Inertia calculations
     I_uu = (I_zz + I_yy) * 0.5 + (I_zz - I_yy) * 0.5 * cos(2 * rot_angle) - I_zy * sin(2 * rot_angle)
@@ -122,6 +139,10 @@ def find_centroid(z_y_angle_coords, t_st, h_st, w_st, t_sp, t_sk,n_st, h, C_a):
     
     
 
+# function to calculate MMOI
+# input stiffener data as z_y_angle_coords, thickness skin t_st, height stiffeners h_st, width stiffener w_st,
+#  thickness spar t_sp,aileron height  h, maximum upward deflection theta
+# returns IZZ in body ref:  TOT_I_zz_br, IYY body ref:  TOT_I_yy_br, IZZ: TOT_I_zz, IYY: TOT_I_yy, IZY: TOT_I_zy
 def moment_of_inertia(z_y_angle_coords, t_st, h_st, w_st, t_sp, h, theta):
     #
     # Calculate Inertias for simple beam axis system
@@ -170,6 +191,7 @@ def moment_of_inertia(z_y_angle_coords, t_st, h_st, w_st, t_sp, h, theta):
         TOT_I_zy_br += I_zy_body_ref  # Should be zero, if not => check values!
 
     # === Semi_circle Moment of inertia:
+
     I_zz_s_circ = integrate.quad(lambda x: t_sk*((0.5*h*sin(x))**2)*0.5*h, -pi/2, pi/2)[0]
 
 
@@ -208,10 +230,14 @@ def moment_of_inertia(z_y_angle_coords, t_st, h_st, w_st, t_sp, h, theta):
     # NOTE: All reported values are in m^4
     return TOT_I_zz_br, TOT_I_yy_br, TOT_I_zz, TOT_I_yy, TOT_I_zy
 
-
+# calculates boom area
+# input stiffener loaction, thickness stiffeners, height stiffeners,width stiffeners, thickness spar, height
 
 def boom_area_calc(stif_loc, t_st, h_st, w_st, t_sp, h):
+
     A_st = w_st*t_st + (h_st-t_st)*t_st
+
+
     circle_perim = 0.5 * pi * (0.5 * h - t_sk)
     total_perimeter = circle_perim + sqrt((0.5 * h - t_sk) ** 2 + (C_a - 0.5 * h - t_sk) ** 2)  # m
 
@@ -219,23 +245,22 @@ def boom_area_calc(stif_loc, t_st, h_st, w_st, t_sp, h):
     B_i_arr = []
     for i in xrange(n_st):
         if i == 0:
-            sigma_ratio = (stif_loc[i][1])/(stif_loc[i+1][1])
-            B_i = A_st + ((t_sk*spacing)/6)*(2+sigma_ratio)
+            sigma_ratio = (stif_loc[i][1]) / (stif_loc[i + 1][1])
+            B_i = A_st + ((t_sk * spacing) / 6) * (2 + sigma_ratio)
             B_i_arr.append(B_i)
-        elif i == (n_st-2):
-            sigma_ratio = (stif_loc[i-2][1])/(stif_loc[i][1])
-            B_i = A_st + ((t_sk*spacing)/6)*(2+sigma_ratio)
+        elif i == (n_st - 2):
+            sigma_ratio = (stif_loc[i - 2][1]) / (stif_loc[i][1])
+            B_i = A_st + ((t_sk * spacing) / 6) * (2 + sigma_ratio)
             B_i_arr.append(B_i)
             B_i_arr.append(B_i)
-        elif i < (n_st-2):
-            sigma_ratio = (stif_loc[i][1])/(stif_loc[i+2][1])
-            B_i = A_st + ((t_sk*spacing)/6)*(2+sigma_ratio)
+        elif i < (n_st - 2):
+            sigma_ratio = (stif_loc[i][1]) / (stif_loc[i + 2][1])
+            B_i = A_st + ((t_sk * spacing) / 6) * (2 + sigma_ratio)
             B_i_arr.append(B_i)
 
     sigma_ratio = -1
-    B_spar_end = ((t_sp*(h-2*t_sk))/6)*(2+sigma_ratio)
+    B_spar_end = ((t_sp * (h - 2 * t_sk)) / 6) * (2 + sigma_ratio)
 
-    
     # returns an array with all stiffener boom area's and the value of the spar end_cap area
     # 0-th boom is boom at LE, 1st 
     return B_i_arr, B_spar_end
@@ -244,6 +269,7 @@ def plot_numerical_bending(Inertia_bend, loc_data, moment_data, E):
     
     # This function can calculate the numerical bending defelction both in y and z directions
     # Parameters: Inertia refernced to bending direction, location data in x-direction, Moments [Nm], Young's Modulus [Pa]
+
 
 
     
@@ -363,29 +389,88 @@ for i in xrange(len(plot_arr)):
 file_n.close()
 
 
+
+# print "Moments: (I_z'z', I_y'y', I_zz, I_yy, I_zy) All in m^4"
+# print moment_of_inertia(stif_loc(h, t_sk, n_st), t_st, h_st, w_st, t_sp, h, theta)
+
+
 # main
 stif_data = stif_loc(h, t_sk, n_st)  # initialize stiffener properties
-# Boom idealization ,ignore LE
+# Boom idealization
 b_r = []  # list for the resultant boom areas
-# spacing calculation, copy pasta from func: stif_loc
-circle_perim = 0.5 * pi * (0.5 * h - t_sk)
-total_perimeter = circle_perim + sqrt((0.5 * h - t_sk) ** 2 + (C_a - 0.5 * h - t_sk) ** 2)  # m
-spacing = total_perimeter / ((n_st + 1) / 2)
 
 # calculating the stiffeners' total boom area
-b_st = []
 b_sp = []
-b_st, b_sp = boom_area_calc(stif_data, t_st, h_st, w_st, t_sp, h)
+
+b_r, b_sp = boom_area_calc(stif_data, t_st, h_st, w_st, t_sp,
+                           h)  # b_r is the list off stiffener boom areas, b_sp for spar(single value in m^2)
+
 
 J = torsional_constant(h, t_sk, C_a)
 # crosssection
-A = sum(cross_section(h, C_a, t_sk, t_sp, n_st, w_st, t_st, h_st))
+A = sum(cross_section(h, C_a, t_sk, t_sp, n_st, w_st, t_st, h_st))  # A is sum of cross section
+
+I_zz_br, I_yy_br, I_zz, I_yy, I_zy = moment_of_inertia(stif_data, t_st, h_st, w_st, t_sp, h,
+                                                       theta)  # values for the MMOI
+
+
+enclosed = sum(enc_area(h, C_a, t_sk))  # enclosed area size
+
 model = []  # whole model
+section_length = l_a / n
+verifdata = []
+qribdata = []
 
 
+# TODO:under construction
+def iteration(section_number):
+    x_start = section_number * section_length
+    mid = x_start + section_length / 2
+    M, V_y, V_z, V_ypr, V_zpr = intsm.internal(mid, I_zz)
 
-#for y in xrange(n):
-#   model.append(iteration(y))
+    stif_data = stif_loc(h, t_sk, n_st)
+    bir, bisp = boom_area_calc(stif_data, t_st, h_st, w_st, t_sp, h)
+    totshearvalue, qrib = totshear.totalshear(stif_data, V_zpr, V_ypr, bir, bisp, I_zz_br, I_yy_br)
+    verifdata.append(totshearvalue[7])
+    verifdata.append(totshearvalue[9])
+    verifdata.append(totshearvalue[0])
+    verifdata.append(totshearvalue[5])
+    qribdata.append(qrib[0])
+    qribdata.append(qrib[1])
+    # print "section: ",section_number,"at x: ", mid
+    # print totshearvalue
+    # print qrib
+    return
+
+
+for i in xrange(len(dataptx)):
+    iteration(dataptx[i])
+verifdata += qribdata
+print verifdata
+# print I_zz_br, I_yy_br
+
+# x_start = 0 * section_length
+# mid = x_start + section_length / 2
+# M, V_y, V_z, V_ypr, V_zpr = intsm.internal(mid, I_zz)
+#
+# stif_data = stif_loc(h, t_sk, n_st)
+# bir, bisp = boom_area_calc(stif_data, t_st, h_st, w_st, t_sp, h)
+# totshearvalue = totshear.totalshear(stif_data, V_zpr, V_ypr, bir, bisp, I_zz_br, I_yy_br)
+# print totshearvalue
+
+x_start = 500 * section_length
+mid = x_start + section_length / 2
+M, V_y, V_z, V_ypr, V_zpr = intsm.internal(mid, I_zz)
+
+stif_data = stif_loc(h, t_sk, n_st)
+bir, bisp = boom_area_calc(stif_data, t_st, h_st, w_st, t_sp, h)
+totshearvalue = totshear.totalshear(stif_data, V_zpr, V_ypr, bir, bisp, I_zz_br, I_yy_br)
+# print totshearvalue
+
+# for y in xrange(n):
+#     model.append(iteration(y))
+
+
 
 # internal stress and deflection
 
@@ -394,16 +479,3 @@ model = []  # whole model
 # print "stiff location print:", stif_loc(h, t_sk, n_st)
 # print "torsional constant", torsional_constant(h, t_sk, C_a)
 # testunits for unittests
-
-
-class TestGeoPropFunctions(unittest.TestCase):
-    def test_Xsection(self):
-        self.assertEqual(cross_section(0, 0, 0, 0, 0, 0, 0, 0), (0, 0, 0, 0))  # zero test
-        # self.assertAlmostEqual(sum(cross_section(h, C_a, t_sk, t_sp, 11, w_st, t_st, h_st)), 0.002, places=None,
-        #                        msg=None, delta=(0.002 / 10))  # test data from catia model
-        self.assertAlmostEqual(sum(cross_section(h, C_a, t_sk, t_sp, 0, w_st, t_st, h_st)), 0.002,
-                               places=3)  # no stiffeners
-
-
-suite = unittest.TestLoader().loadTestsFromTestCase(TestGeoPropFunctions)
-unittest.TextTestRunner(verbosity=2).run(suite)
