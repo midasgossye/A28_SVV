@@ -8,10 +8,12 @@ Created on Mon Feb 19 14:07:00 2018
 from math import *
 import unittest
 import scipy.integrate as integrate
+import numpy as np
+from matplotlib import pyplot as plt
+
 from int_stress_and_defl import *
 import internal_shear_and_moment as intsm
 import total_shear_calc as totshear
-import numpy as np
 
 # Global variables
 C_a = 0.515  # Chord length aileron [m]
@@ -41,6 +43,7 @@ for i in xrange(len(datax)):
     dataptx.append(int(datax[i] / l_a * 1000))
 print dataptx, "<--- positions are from 1000 sections"
 
+E = 71*10**9
 
 # functions
 
@@ -48,7 +51,7 @@ print dataptx, "<--- positions are from 1000 sections"
 # input  height aileron ha, chord length aileron ca, skin thickness tskin, spar thickness tspar,
 # stiffener_amount, width stiffener w_stiffener, thickness stiffener t_stiffener, height stiffener h_stiffener
 # return cshape, spar, triangle, stiffeners  # unit: m^2
-def cross_section(ha, ca, tskin, tspar, stiffener_amount, w_stiffener, t_stiffener, h_stiffener):
+def cross_section(ha,ca , tskin, tspar, stiffener_amount, w_stiffener, t_stiffener, h_stiffener):
     # C shape
     cshape = 0.5 * pi * ((ha / 2) ** 2) - 0.5 * pi * ((ha - (2 * tskin)) / 2) ** 2
     # spar
@@ -98,7 +101,9 @@ def stif_loc(h, t_sk, n_st):
             apnd_itm = (z_coordinate, -y_coordinate, -rot_angle)
             z_y_angle_coords.append(apnd_itm)
 
+
         # print "Stif.", i, "\t z:", z_coordinate, "\t y:", y_coordinate, "\t angle:", degrees(rot_angle)
+
 
     return z_y_angle_coords  # [(stringer0 z,y,rot),(stringer1 z,y,rot), ...]
 
@@ -127,13 +132,20 @@ def axis_transformation(I_zz, I_yy, I_zy, rot_angle):
     I_vv = (I_zz + I_yy) * 0.5 - (I_zz - I_yy) * 0.5 * cos(2 * rot_angle) + I_zy * sin(2 * rot_angle)
     I_uv = (I_zz - I_yy) * 0.5 * sin(2 * rot_angle) + I_zy * cos(2 * rot_angle)
     return I_uu, I_vv, I_uv
-
+    
+def find_centroid(z_y_angle_coords, t_st, h_st, w_st, t_sp, t_sk,n_st, h, C_a):
+    
+    print sum_cen
+    return z_centr
+    
+    
 
 # function to calculate MMOI
 # input stiffener data as z_y_angle_coords, thickness skin t_st, height stiffeners h_st, width stiffener w_st,
 #  thickness spar t_sp,aileron height  h, maximum upward deflection theta
 # returns IZZ in body ref:  TOT_I_zz_br, IYY body ref:  TOT_I_yy_br, IZZ: TOT_I_zz, IYY: TOT_I_yy, IZY: TOT_I_zy
 def moment_of_inertia(z_y_angle_coords, t_st, h_st, w_st, t_sp, h, theta):
+    #
     # Calculate Inertias for simple beam axis system
     #   |        
     #   |        ^ (y)
@@ -181,7 +193,8 @@ def moment_of_inertia(z_y_angle_coords, t_st, h_st, w_st, t_sp, h, theta):
 
     # === Semi_circle Moment of inertia:
 
-    I_zz_s_circ = integrate.quad(lambda x: t_sk * ((0.5 * h * sin(x)) ** 2) * 0.5 * h, -pi / 2, pi / 2)[0]
+    I_zz_s_circ = integrate.quad(lambda x: t_sk*((0.5*h*sin(x))**2)*0.5*h, -pi/2, pi/2)[0]
+
 
     I_yy_s_circ = I_zz_s_circ
     TOT_I_zz_br += I_zz_s_circ
@@ -223,7 +236,9 @@ def moment_of_inertia(z_y_angle_coords, t_st, h_st, w_st, t_sp, h, theta):
 # input stiffener loaction, thickness stiffeners, height stiffeners,width stiffeners, thickness spar, height
 # outputs boom_arear of booms in a list b_i_arr, b_i_spar
 def boom_area_calc(stif_loc, t_st, h_st, w_st, t_sp, h):
-    A_st = w_st * t_st + (h_st - t_st) * t_st
+
+    A_st = w_st*t_st + (h_st-t_st)*t_st
+
 
     circle_perim = 0.5 * pi * (0.5 * h - t_sk)
     total_perimeter = circle_perim + sqrt((0.5 * h - t_sk) ** 2 + (C_a - 0.5 * h - t_sk) ** 2)  # m
@@ -251,10 +266,135 @@ def boom_area_calc(stif_loc, t_st, h_st, w_st, t_sp, h):
     # returns an array with all stiffener boom area's and the value of the spar end_cap area
     # 0-th boom is boom at LE, 1st 
     return B_i_arr, B_spar_end
+    
+def plot_numerical_bending(Inertia_bend, loc_data, moment_data, E):
+    
+    # This function can calculate the numerical bending defelction both in y and z directions
+    # Parameters: Inertia refernced to bending direction, location data in x-direction, Moments [Nm], Young's Modulus [Pa]
+
+
+
+    
+    least_error = 100
+    best_value = (0.0,0.0)
+    
+    # The following for-loops will try to find the best fitting integration constants (c_1 and c_2) to match the deflection to the boundary conditions
+    for c_1 in np.arange(-0.1, -0.1, 0.001):
+        for c_2 in np.arange(-0.1, -0.1, 0.001):
+            # === Initialise first integration
+            Int = 0
+            Int_arr = np.array([])
+            # === 
+            for i in xrange(270):
+                x_1 = loc_data[i] # 
+                x_2 = loc_data[i+1]
+                m_x_1 = (-1*moment_data[i])/(E*Inertia_bend)
+                m_x_2 = (-1*moment_data[i+1])/(E*Inertia_bend)
+                
+                dx = x_2-x_1
+                
+                Int += dx*(m_x_1+m_x_2)/2 + c_1
+                Int_arr = np.append(Int_arr, Int)
+            
+            Int_2 = 0
+            Int_2_arr = np.array([])
+            for i in xrange(269):
+                x_1 = loc_data[i]
+                x_2 = loc_data[i+1]
+                y_1 = Int_arr[i]
+                y_2 = Int_arr[i+1]
+                
+                dx = x_2-x_1
+                
+                Int_2 += dx*(y_1+y_2)/2 + c_2
+                Int_2_arr = np.append(Int_2_arr, Int_2)
+            
+            print "c1:",c_1,"\tc2:",c_2
+            print Int_2_arr[16], "\t", Int_2_arr[105]
+            max_defl = max(Int_2_arr)
+            
+            error = abs(Int_2_arr[16]+max_defl+(0.1034/2.54)/2)  + abs(Int_2_arr[251]+max_defl + (0.2066/2.54))/2# + abs(Int_2_arr[105])/3
+            #+ abs(Int_2_arr[105])/3
+            if error < least_error:
+                
+                best_value = (c_1,c_2)
+                least_error = error
+            
+            
+    print best_value   
+    c_1 = best_value[0]
+    
+    c_2 = best_value[1]
+    c_1 = 0.002 	
+    c_2 = -0.003
+    #c_1 = 0.0011
+    #c_2 = -0.001
+    Int = 0
+    Int_arr = np.array([])
+    for i in xrange(270):
+        x_1 = loc_data[i]
+        x_2 = loc_data[i+1]
+        m_x_1 = (-1*moment_data[i])/(float(E*I_bend))
+        m_x_2 = (-1*moment_data[i+1])/(float(E*I_bend))
+        print I_bend
+        dx = x_2-x_1
+        
+        Int += dx*(m_x_1+m_x_2)/2 + c_1
+        Int_arr = np.append(Int_arr, Int)
+    
+    Int_2 = 0
+    Int_2_arr = np.array([])
+    for i in xrange(269):
+        x_1 = x_coor[i]
+        x_2 = x_coor[i+1]
+        y_1 = Int_arr[i]
+        y_2 = Int_arr[i+1]
+        
+        dx = x_2-x_1
+        
+        Int_2 += dx*(y_1+y_2)/2 + c_2
+        Int_2_arr = np.append(Int_2_arr, Int_2)
+    max_defl = max(Int_2_arr)
+    print "c1:",c_1,"\tc2:",c_2
+    print Int_2_arr[16], "\t", Int_2_arr[105]
+    plt.grid()
+    Int_2_arr_inv = np.array([])
+    for i in xrange(len(Int_2_arr)-1, -1, -1):
+        Int_2_arr_inv = np.append(Int_2_arr_inv, Int_2_arr[i])
+    print max_defl
+    plot_arr = Int_2_arr_inv+max_defl+0.088962-0.00077
+    plt.plot(x_coor[:269], -Int_2_arr_inv+max_defl+0.22479-0.359795)#+1*max_defl+0.098)
+    plt.xlabel("x-coordinate [m]")
+    plt.ylabel("z-deflection [m]")
+    plt.show()
+        
+    
+    return x_coor[:269], plot_arr
+
+#B_i_arr[0]
+print "Moments: (I_z'z', I_y'y', I_zz, I_yy, I_zy) All in m^4"
+print moment_of_inertia(stif_loc(h, t_sk, n_st), t_st, h_st, w_st, t_sp, h, theta)
+
+
+
+Moment_data = np.genfromtxt("M_y.txt")
+x_coor = Moment_data[:,0]
+I_bend = 6.385385647322895e-05
+M_x = Moment_data[:,1]
+
+x_coor, plot_arr = plot_numerical_bending(I_bend, x_coor, M_x, E)
+file_n = open("defl_data_z.txt", "w")
+
+for i in xrange(len(plot_arr)):
+    file_n.write(str(plot_arr[i]))
+    file_n.write("\n")
+file_n.close()
+
 
 
 # print "Moments: (I_z'z', I_y'y', I_zz, I_yy, I_zy) All in m^4"
 # print moment_of_inertia(stif_loc(h, t_sk, n_st), t_st, h_st, w_st, t_sp, h, theta)
+
 
 # main
 stif_data = stif_loc(h, t_sk, n_st)  # initialize stiffener properties
@@ -263,8 +403,10 @@ b_r = []  # list for the resultant boom areas
 
 # calculating the stiffeners' total boom area
 b_sp = []
+
 b_r, b_sp = boom_area_calc(stif_data, t_st, h_st, w_st, t_sp,
                            h)  # b_r is the list off stiffener boom areas, b_sp for spar(single value in m^2)
+
 
 J = torsional_constant(h, t_sk, C_a)
 # crosssection
@@ -272,6 +414,7 @@ A = sum(cross_section(h, C_a, t_sk, t_sp, n_st, w_st, t_st, h_st))  # A is sum o
 
 I_zz_br, I_yy_br, I_zz, I_yy, I_zy = moment_of_inertia(stif_data, t_st, h_st, w_st, t_sp, h,
                                                        theta)  # values for the MMOI
+
 
 enclosed = sum(enc_area(h, C_a, t_sk))  # enclosed area size
 
@@ -328,6 +471,7 @@ totshearvalue = totshear.totalshear(stif_data, V_zpr, V_ypr, bir, bisp, I_zz_br,
 
 # for y in xrange(n):
 #     model.append(iteration(y))
+
 
 
 # internal stress and deflection
