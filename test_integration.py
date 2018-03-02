@@ -25,3 +25,5 @@ solution = sp.integrate(x*(sp.sin(x))**2, (x, 0, q))
 # Print the analytical solution:
 print "Solution:", solution
 
+# print answer for q = 1:
+print float(solution.subs(q, 1))
