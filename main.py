@@ -292,7 +292,8 @@ def iteration(section_number):
     verifdata.append(totshearvalue[9])
     verifdata.append(totshearvalue[0])
     verifdata.append(totshearvalue[5])
-    qribdata.append(qrib)
+    qribdata.append(qrib[0])
+    qribdata.append(qrib[1])
     # print "section: ",section_number,"at x: ", mid
     # print totshearvalue
     # print qrib
