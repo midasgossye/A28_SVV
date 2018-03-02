@@ -366,14 +366,14 @@ x_coor = Moment_data[:, 0]
 I_bend = 6.385385647322895e-05
 M_x = Moment_data[:, 1]
 
-#TODO: uncomment at end
-# x_coor, plot_arr = plot_numerical_bending(I_bend, x_coor, M_x, E)
-# file_n = open("defl_data_z.txt", "w")
-#
-# for i in xrange(len(plot_arr)):
-#     file_n.write(str(plot_arr[i]))
-#     file_n.write("\n")
-# file_n.close()
+
+x_coor, plot_arr = plot_numerical_bending(I_bend, x_coor, M_x, E)
+file_n = open("defl_data_z.txt", "w")
+
+for i in xrange(len(plot_arr)):
+    file_n.write(str(plot_arr[i]))
+    file_n.write("\n")
+file_n.close()
 
 # print "Moments: (I_z'z', I_y'y', I_zz, I_yy, I_zy) All in m^4"
 # print moment_of_inertia(stif_loc(h, t_sk, n_st), t_st, h_st, w_st, t_sp, h, theta)
@@ -454,11 +454,3 @@ totshearvalue = totshear.totalshear(stif_data, V_zpr, V_ypr, bir, bisp, I_zz_br,
 # for y in xrange(n):
 #     model.append(iteration(y))
 
-
-# internal stress and deflection
-
-
-# test
-# print "stiff location print:", stif_loc(h, t_sk, n_st)
-# print "torsional constant", torsional_constant(h, t_sk, C_a)
-# testunits for unittests
